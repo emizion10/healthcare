@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Symptom Checker</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<style >
+	@import url(//fonts.googleapis.com/css?family=Lato:100,300,300i,400);
+
+body {
+  box-sizing: border-box;
+  font-family: Lato, Arial;
+  text-align: center;
+  color: #eee;
+  background-color: #000;
+
+}
+
+#txtbox {
+    font-size: 18pt;
+    height: 100px;
+    width : 300px;
+}
+
+h1 {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  color: #eee;
+  font-weight: 400;
+  text-align: center;
+  font-size: 200%;
+  letter-spacing: 4px;
+}
+
+h4 {
+  margin-top: 1em;
+  color: #eee;
+  font-size: 150%;
+  font-weight: 300;
+  text-align: center;
+}
+
+button {
+  display: inline;
+  background: #800000;
+  color: #2184AC;
+  border: 0;
+  padding: 4px;
+}
+
+input {
+    display: block;
+    width: 98%;
+  height: 30px; 
+    margin-top: 1.0em;
+   padding: 4px;
+}
+
+small {
+  display: inline-block;
+  margin-top: 5px;
+  color: white;
+  font-size: 100%;
+  color: #fff;
+}
+
+.login-box {
+    padding: 1em 1em 1em 1em;
+    margin: auto;
+    text-align: center;
+    display: block;
+    background-color: #6f92dc;
+    /*border: 1px dashed white;*/
+    width: 60%;
+  height: auto;
+}
+
+.outer-box {
+    display: block;
+    margin: auto;
+    background: #6f92dc;
+    border-radius: 5px;
+    width: 50%;
+    height: 20em;
+  height: auto;
+}
+
+#btn-login {
+  display: block;
+  width: 100%;
+  height: 40px;
+  margin-top: 2.0em;
+  border-radius: 4px;
+  background-color: #3366cc;
+  color: #fff;
+}
+
+#btn-forgot {
+  display: block;
+  width: 100%;
+  margin-top: 1.0em;
+  border-radius: 2px;
+  color: #fff;
+  background-color: #000D36;
+}
+</style>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+	var sympt;
+
+	 $.get('/symptomchecker/profile' , function(data){
+	 	$('#symptoms').html(data);
+	 	
+    	
+  });
+
+function add(){
+	var valselected = document.getElementById("symptoms").value;
+	var symclicked = $("#symptoms option:selected").text();
+    var symselected = document.getElementById("sym").value;
+	var arr = symselected.split(",");
+
+            var i = 0;
+            var flag = -1;
+                while (i < arr.length) {
+                    if (arr[i] == valselected) {
+                        flag = 1;
+                        break;
+                    }
+                    i = i + 1;
+                }
+                if (flag == -1) {
+                    if (symselected.length > 0){
+                        document.getElementById("sym").value = arr.join(",") + "," + symclicked;
+                        sympt = sympt+ "," + valselected;}
+
+                    else{
+                        document.getElementById("sym").value = symclicked;
+                        sympt = valselected;}
+
+                }
+                
+            
+}
+
+
+function clr(){
+	document.getElementById("sym").value = '';
+                        sympt = '';
+	 	$('#result').hide();
+
+}
+function sub(){
+	
+
+	$.get('/symptomchecker/predict' ,{'symptoms':sympt}, function(data){
+	 	$('#result').show();
+
+	 	$('#result').html(data);
+	 	
+    	
+  });
+}
+
+</script>
+
+</head>
+<body>
+
+<br>
+	<h1 >HEALTH CHAIN</h1>
+  <div class="outer-box">
+    <div class="login-box">
+      <h4 class="login-text">SYMPTOM CHECKER</h4>
+      <br>
+      <center>
+      <!-- <input placeholder="Kullanıcı Adı"> -->
+		<label>Symptoms :</label>
+
+      <select id="symptoms" name="symptoms">
+			
+		</select>
+		<br><br>
+		<button onclick="add()" class="btn btn-success">ADD</button> &nbsp;
+		<button onclick="clr()" class="btn btn-success">CLEAR</button>
+
+
+            <input class="#txtbox" type="text" id="sym" name="sym"  placeholder="Symptoms">
+      <!-- <input placeholder="Şifre"> -->
+      <br>
+		<button onclick="sub()" class="btn btn-success">SUBMIT</button>
+
+
+      <!-- <button id="btn-forgot">Şifremi unuttum!</button> -->
+      </center>
+    </div>
+  </div>
+
+</div>
+<div class="header-bottom">
+
+<div class="topmenu">
+
+</div>
+	<p>
+<div id="result"></div>
+		
+	</p>
+
+</body>
+</html>

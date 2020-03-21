@@ -1,0 +1,22 @@
+{% extends 'pages/base.html' %}
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+
+<h2>Welcome, {{ user.username }}. </h2>
+
+
+{% if user.user_type == 3 %}
+<a href="{% url 'addd' %}">New Doctor Registration</a>
+
+{% elif user.user_type == 2 %}
+<a href="{% url 'addp' %}">New Patient Registration</a>
+
+
+
+{% endif %}
+
+
+
+
+{% endblock %}
