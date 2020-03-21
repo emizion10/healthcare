@@ -92,7 +92,7 @@ class Patient(models.Model):
 	weight=models.DecimalField(max_digits=6, decimal_places=2,blank=True)
 	bloodgroup = models.CharField(choices=bloodgroup_choices, max_length=12, default='-', blank=True)
 	place=models.CharField(max_length=50,blank=True)
-	imagefile=models.ImageField(upload_to='patient/',default="default.jpg",blank=True)
+	imagefile=models.ImageField(upload_to='patient/',default="default.jpg",blank=True,null=True)
 
 
 	def __str__(self):
@@ -107,7 +107,7 @@ class Doctor(models.Model):
 	gender=models.IntegerField(choices=GENDER_CHOICES,blank=True)
 	spec=models.CharField(max_length=50,blank=True)
 	hos=models.CharField(max_length=150,blank=True)
-	imagefile=models.ImageField(upload_to='doctor/',default="default.jpg",blank=True)
+	imagefile=models.ImageField(upload_to='doctor/',default="default.jpg",blank=True,null=True)
 
 	# city = models.CharField(max_length=255)
 	# location = LocationField(based_fields=['city'], zoom=7, default=Point(1.0, 1.0))
@@ -127,7 +127,7 @@ class Hospital(models.Model):
 	services=models.TextField(blank=True)
 	email=models.EmailField(blank=True)
 	url=models.URLField(blank=True)
-	imagefile=models.ImageField(upload_to='hospital/',blank=True)
+	imagefile=models.ImageField(upload_to='hospital/',blank=True,null=True)
 	# city = models.CharField(max_length=255)
 	# location = LocationField(based_fields=['city'], zoom=7, default=Point(1.0, 1.0))
 	# loc=LocationField()

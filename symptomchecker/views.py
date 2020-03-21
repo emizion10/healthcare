@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from sklearn.externals import joblib
 
 
-def home(request):
+def homesymptomchecker(request):
 	return render(request,'symptomchecker/disease_prediction.html')
 
 reloadModel=joblib.load('./models/model2.pkl')
