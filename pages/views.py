@@ -1,13 +1,15 @@
 from . models import *
 from . forms import *
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render_to_response, redirect, render, get_object_or_404
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import PermissionDenied
-
+from . decorators import *
+from easy_pdf.views import PDFTemplateView, PDFTemplateResponseMixin
+from django.db.models import Q
 
 @login_required(login_url='login')
 def home(request):
@@ -142,6 +144,7 @@ class DoctorProfile(MyPermissionMixin, DetailView):
     def test_func(self):
         return (self.request.user.user_type == 2)
 
+
 class PatientProfile(MyPermissionMixin, DetailView):
     raise_exception = True
     login_url = "/login/"
@@ -149,6 +152,12 @@ class PatientProfile(MyPermissionMixin, DetailView):
 
     def get_object(self):
         return get_object_or_404(Patient, username=self.request.user)
+    
+    def get_context_data(self,**kwargs):
+        context = super(PatientProfile, self).get_context_data(**kwargs)
+        pt = get_object_or_404(Patient,username = self.request.user)
+        context['records'] = MedicalRecord.objects.filter(patient_id=pt)
+        return context
 
     template_name = 'pages/patientprofile.html'
 
@@ -156,7 +165,77 @@ class PatientProfile(MyPermissionMixin, DetailView):
         return (self.request.user.user_type == 1)
 
 
+class HospitalProfile(MyPermissionMixin, DetailView):
+    raise_exception = True
+    login_url = "/login/"
+    context_object_name = 'hospital'
+
+    def get_object(self):
+        return get_object_or_404(Hospital, username=self.request.user)
+
+    template_name = 'pages/hospitalprofile.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 3)
+
+
+class MedicalCard(PDFTemplateResponseMixin, DetailView):
+    raise_exception = True
+    login_url = "/login/"
+    context_object_name = 'patient'
+
+    def get_object(self):
+        return get_object_or_404(Patient, username=self.request.user)
+
+    template_name = 'pages/medicalcard.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 1)
+
+
+class TreatPatient(MyPermissionMixin, TemplateView):
+    raise_exception = True
+    login_url = "/login/"
+
+    template_name = 'pages/treatpatient.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 2)
+
+
+@user_is_doctor
+def treatpatientprofile(request):
+    if request.method == 'POST':
+        request.session['regid'] = request.POST['regid']
+        reg = request.POST['regid']
+        pt = get_object_or_404(Patient, regid=reg)
+        doc = get_object_or_404(Doctor,username = request.user)
+        rec = MedicalRecord.objects.filter(Q(permission='public')|Q(doctor_id=doc))
+        return render(request, 'pages/patientprofile.html', {'patient': pt,'records':rec})
+
+
+@user_is_doctor
+def addmedicalrecord(request):
+    if request.method == 'POST':
+        form = MedicalRecordForm(request.POST)
+        if form.is_valid():
+            medrecord = form.save(commit=False)
+            medrecord.permission = 'private'
+            medrecord.doctor_id = get_object_or_404(
+                Doctor, username=request.user)
+            medrecord.patient_id = get_object_or_404(
+                Patient, regid=request.session['regid'])
+            medrecord.save()
+            pt = get_object_or_404(Patient, regid=request.session['regid'])
+            doc = get_object_or_404(Doctor,username=request.user)
+            rec = MedicalRecord.objects.filter(Q(permission='public')|Q(doctor_id=doc))
+            return render(request, 'pages/patientprofile.html', {'patient': pt,'records':rec})
+    else:
+        form = MedicalRecordForm()
+
+    return render(request, 'pages/addmedicalrecord.html', {'forms': form})
+
+
 def logout_view(request):
     logout(request)
     return redirect("login")
-

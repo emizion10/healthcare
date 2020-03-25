@@ -1,4 +1,5 @@
 from django.db import models
+from django_mysql.models import ListTextField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.admin.widgets import AdminDateWidget
 import uuid 
@@ -15,6 +16,12 @@ USER_TYPE_CHOICES = (
       (3, 'hospital'),
       (4,'admin'),
   )
+
+ACCESS_CHOICES = (
+	('public','public'),
+	('private','private'),
+	('custom','custom'),
+)
 
 class MyAccountManager(BaseUserManager):
 	def create_user(self, username, password=None):
@@ -136,4 +143,26 @@ class Hospital(models.Model):
 		return self.name
 
 
-
+class MedicalRecord(models.Model):
+	id=models.BigAutoField(primary_key=True)
+	patient_id = models.ForeignKey(Patient, verbose_name="patient",on_delete=models.CASCADE)
+	doctor_id = models.ForeignKey(Doctor, verbose_name="doctor",on_delete=models.CASCADE)
+	condition = models.CharField(max_length=100,blank=True)
+	permission = models.CharField(choices=ACCESS_CHOICES,max_length=10,blank=True)
+	access = ListTextField(
+		base_field = models.CharField(max_length=100,blank=True),
+	)	
+	diagnosis = ListTextField(
+		base_field = models.CharField(max_length=100,blank=True),
+	)
+	procedures = ListTextField(
+		base_field = models.CharField(max_length=100,blank=True),
+	)
+	prescription = ListTextField(
+		base_field = models.CharField(max_length=100,blank=True),
+	)
+	description = models.TextField(blank=True)
+	visit_date = models.DateTimeField(auto_now_add=True, verbose_name="Visit Date")
+    
+	def __str__(self):
+		return u'%s  %s' % (self.patient_id, self.id)

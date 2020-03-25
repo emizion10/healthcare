@@ -1,0 +1,89 @@
+{% extends 'pages/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Home Page{% endblock %}
+{% load static %}
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="{% static '/js/medicalrecord.js' %}"></script>
+<script type="text/javascript">
+
+</script>
+
+{% endblock %}
+{% block content %}
+
+
+
+<div id="ehr" class="container">
+  
+<form method='POST'>
+        {% csrf_token %}
+        <input type="text" id="icd9dx" placeholder="Diagnosis">
+        <button type="button" id="diagb" class="success" onclick="add(this.id)">Add</button>
+        <br><br>
+        <label>Symptoms:</label>
+        <input type="textarea" id="diag" placeholder="" name="diagnosis">
+        <br><br>
+        <input type="text" id="condition" placeholder="Medical Condition">
+        <button id="diseaseb" type="button" class="success" onclick="add(this.id)">Add</button>
+        <br><br>
+        <label>Disease:</label>
+        <input type="text" id="disease" placeholder="" name="condition">
+        <br><br>
+        <input type="text" id="icd9sg" placeholder="Procedures">
+        <button id="procb" type="button" class="success" onclick="add(this.id)">Add</button>
+        <br><br>
+        <label>Procedures:</label>
+        <input type="text" id="proc" placeholder="" name="procedures">
+
+        <br><br>
+        <input type="text" id="rxterms" placeholder="Drug name">
+        <input type="text" id="drug_strengths" placeholder="Strength list">
+        <select id='ptype'>
+            <option>Morning(Before)</option>
+            <option>3 times</option>
+
+        </select>
+        <button id="medb" type="button" class="success" onclick="add(this.id)">Add</button>
+        <br><br>
+        <label>Medicines:</label>
+        <input type="text" id="med" placeholder="" name="prescription">
+        <br><br>
+        <input type="text" name="description" placeholder="Description">
+        <input type="submit" value="Save">
+    </form>
+</div>
+
+
+
+{% endblock %}
+
+{% block endscript %}
+<link
+    href='https://clinicaltables.nlm.nih.gov/autocomplete-lhc-versions/17.0.2/autocomplete-lhc.min.css'
+    rel="stylesheet">
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+<script
+    src='https://clinicaltables.nlm.nih.gov/autocomplete-lhc-versions/17.0.2/autocomplete-lhc.min.js'></script>
+<script type="text/javascript">
+new Def.Autocompleter.Search('icd9dx', 'https://clinicaltables.nlm.nih.gov/api/icd9cm_dx/v3/search?sf=short_name,long_name&df=short_name');
+  
+new Def.Autocompleter.Search('condition','https://clinicaltables.nlm.nih.gov/api/conditions/v3/search');
+ 
+ new Def.Autocompleter.Search('icd9sg', 'https://clinicaltables.nlm.nih.gov/api/icd9cm_sg/v3/search?df=short_name'); 
+
+ new Def.Autocompleter.Prefetch('drug_strengths', []);
+new Def.Autocompleter.Search('rxterms',
+ 'https://clinicaltables.nlm.nih.gov/api/rxterms/v3/search?ef=STRENGTHS_AND_FORMS');
+Def.Autocompleter.Event.observeListSelections('rxterms', function() {
+  var drugField = $('#rxterms')[0];
+  var autocomp = drugField.autocomp;
+  var strengths =
+    autocomp.getSelectedItemData()[0].data['STRENGTHS_AND_FORMS'];
+  if (strengths)
+    $('#drug_strengths')[0].autocomp.setListAndField(strengths, '');
+})
+       
+</script>
+{% endblock %}

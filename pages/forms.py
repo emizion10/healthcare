@@ -100,3 +100,10 @@ class DoctorForm(forms.ModelForm):
             raise forms.ValidationError('DUPLICATE_REGID')
         return self.cleaned_data['regid']
       
+
+class MedicalRecordForm(forms.ModelForm):
+    
+    
+    class Meta():
+        model = MedicalRecord
+        fields = ('condition','prescription','procedures','description','diagnosis')

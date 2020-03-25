@@ -3,10 +3,22 @@
 
 {% block content %}
 
+{% if user.user_type == 1 %}
 
-<h2>{{patient.regid}}</h2>
+<a href="{% url 'medicalcard' %}">Medical Card</a>
+{% elif user.user_type == 2 %}
+<a href="{% url 'addmedicalrecord' %}">Add Medical Record</a>
+
+{% endif %}
+<h1>PROFILE</h1>
+<h2>{{patient.name}}</h2>
 <h2>{{patient.age}}</h2>
-
+<h2>{{patient.bloodgroup}}</h2>
+<br><br>
+<h1>MEDICAL RECORDS</h1>
+{% for rec in records %}
+<h3>{{rec.condition}} | {{rec.visit_date}}</h3>
+{% endfor %}
 
 
 {% endblock %}

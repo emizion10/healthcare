@@ -1,0 +1,74 @@
+{% extends 'pages/base.html' %}
+{% block title %}Patient{% endblock %}
+{% load static %}
+
+{% block script %}
+
+<script type="text/javascript" src="{% static '/js/instascan.min.js' %}"></script>
+
+
+
+<script type="text/javascript">
+
+    function scancode(){
+    
+    let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    scanner.addListener('scan', function (content) {
+      console.log(content);
+      pid = content;
+        document.getElementById('pid').value = content;
+
+    //   $.get('patient',{'regid':content}, function(data){
+    //     var code = "<h2>"+data[0].pname+"</h2>";
+    //     $('#scan').hide();
+    //     $('#profile').html(code);
+    
+    // });
+
+    scanner.stop();
+    $('#scanform').submit();
+
+    $('#preview').hide();
+
+    });
+    Instascan.Camera.getCameras().then(function (cameras) {
+      if (cameras.length > 0) {
+        scanner.start(cameras[0]);
+      } else {
+        console.error('No cameras found.');
+      }
+    }).catch(function (e) {
+      console.error(e);
+    });
+    }
+    
+    </script>
+
+
+
+
+{% endblock %}
+{% block content %}
+
+<div id="scan">
+    <button  onclick="scancode()">Scan Health Card</a>
+
+</div>
+
+<form id='scanform' method="POST" action="patient">
+        {% csrf_token %}
+    <input type="hidden" id="pid" name='regid'>
+</form>
+
+<div id="profile"></div>
+
+
+
+<center>
+    <video id="preview"></video>
+</center>
+
+
+
+{% endblock %}
+

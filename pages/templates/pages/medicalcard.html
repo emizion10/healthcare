@@ -1,0 +1,13 @@
+{% extends "easy_pdf/base.html" %}
+
+{% block content %}
+    <div id="content">
+        <h1>Hi there!</h1>
+        <h2>{{patient.regid}}</h2>
+        {% load qr_code %}
+
+	<h1>QRCODE</h1>
+<center>
+	{% qr_from_text patient.regid size="4" image_format="png" error_correction="L" %}
+    </div>
+{% endblock %}

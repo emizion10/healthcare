@@ -19,3 +19,5 @@ admin.site.register(MyUser, AccountAdmin)
 admin.site.register(Patient)
 admin.site.register(Doctor)
 admin.site.register(Hospital)
+admin.site.register(MedicalRecord)
+
