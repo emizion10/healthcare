@@ -16,6 +16,10 @@ urlpatterns = [
     path('treatpatient/',TreatPatient.as_view(), name='treatpatient'),
     path('treatpatient/patient',treatpatientprofile, name='patient'),
     path('treatpatient/medicalrecord',views.addmedicalrecord, name='addmedicalrecord'),
+    path('medicalrecord/<int:pk>',MedicalRecordDetail.as_view(), name='medicalrecord'),
+    path('medicalrecord/editpermission/',views.editpermission, name='editpermission'),
+    
+    
     
     
     

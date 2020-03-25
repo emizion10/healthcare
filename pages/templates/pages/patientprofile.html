@@ -17,7 +17,10 @@
 <br><br>
 <h1>MEDICAL RECORDS</h1>
 {% for rec in records %}
-<h3>{{rec.condition}} | {{rec.visit_date}}</h3>
+<a href="{% url 'medicalrecord' pk=rec.pk %}">
+    <h3>{{rec.condition}} | {{rec.visit_date}}</h3>
+</a>
+
 {% endfor %}
 
 

@@ -149,9 +149,7 @@ class MedicalRecord(models.Model):
 	doctor_id = models.ForeignKey(Doctor, verbose_name="doctor",on_delete=models.CASCADE)
 	condition = models.CharField(max_length=100,blank=True)
 	permission = models.CharField(choices=ACCESS_CHOICES,max_length=10,blank=True)
-	access = ListTextField(
-		base_field = models.CharField(max_length=100,blank=True),
-	)	
+	access = models.CharField(max_length=100,blank=True)	
 	diagnosis = ListTextField(
 		base_field = models.CharField(max_length=100,blank=True),
 	)

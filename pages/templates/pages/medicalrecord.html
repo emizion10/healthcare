@@ -1,0 +1,64 @@
+{% extends 'pages/base.html' %}
+{% block title %}Profile{% endblock %}
+
+
+{% block content %}
+<div class="container">
+
+<h1>MEDICAL RECORDS</h1>
+<h3>{{record.condition}} </h3>
+{% for i in record.prescription %}
+<h3>{{i}} </h3>
+{% endfor %}
+<h3>{{record.doctor_id}} </h3>
+
+
+{% if user.user_type == 1 %}
+
+<select id='perm'>
+    <option value="private">Private</option>
+    <option value="public">Public</option>
+    <option value="custom">Custom</option>
+
+</select>
+<button onclick="change()" class="success" >Save</button>
+<br>
+<input id='custom' type="text">
+{% endif %}
+<h3>{{record.visit_date}} </h3>
+
+</div>
+
+{% endblock %}
+
+{%  block endscript %}
+<script type="text/javascript">
+        $('#custom').hide();
+    var mid = "{{record.id}}"
+    var perm = "{{record.permission}}";
+    $('#perm').val(perm);
+    if (document.getElementById('perm').value=='custom'){
+        $('#custom').show();
+        document.getElementById('custom').value="{{record.access}}";
+
+    }
+  
+    $('#perm').on('change', function() {
+    if (this.value=='custom'){
+        $('#custom').show();
+    }
+    else{
+        $('#custom').hide();
+
+    }
+});
+    
+    function change(){
+        var sel = document.getElementById('perm').value;
+        var custom =document.getElementById('custom').value;
+        $.get('editpermission',{'id':mid,'type':sel,'custom':custom},function(data){
+            window.location.reload();
+        })
+    }
+</script>
+{% endblock %}

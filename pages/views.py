@@ -210,7 +210,8 @@ def treatpatientprofile(request):
         reg = request.POST['regid']
         pt = get_object_or_404(Patient, regid=reg)
         doc = get_object_or_404(Doctor,username = request.user)
-        rec = MedicalRecord.objects.filter(Q(permission='public')|Q(doctor_id=doc))
+        
+        rec = MedicalRecord.objects.filter(Q(permission='public')|Q(doctor_id=doc)|Q(access__iregex = r'('+str(doc.dname)+'),?'))
         return render(request, 'pages/patientprofile.html', {'patient': pt,'records':rec})
 
 
@@ -228,13 +229,38 @@ def addmedicalrecord(request):
             medrecord.save()
             pt = get_object_or_404(Patient, regid=request.session['regid'])
             doc = get_object_or_404(Doctor,username=request.user)
-            rec = MedicalRecord.objects.filter(Q(permission='public')|Q(doctor_id=doc))
+            rec = MedicalRecord.objects.filter(Q(permission='public')|Q(doctor_id=doc)|Q(access__iregex = r'('+str(doc.dname)+'),?'))
             return render(request, 'pages/patientprofile.html', {'patient': pt,'records':rec})
     else:
         form = MedicalRecordForm()
 
     return render(request, 'pages/addmedicalrecord.html', {'forms': form})
 
+class MedicalRecordDetail(MyPermissionMixin,DetailView):
+    raise_exception = True
+    login_url = "/login/"
+    model = MedicalRecord
+    context_object_name = 'record'
+
+    template_name = 'pages/medicalrecord.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 2 or self.request.user.user_type == 1)
+
+    
+@user_is_patient
+def editpermission(request):
+    id = request.GET.get('id')
+    perm = request.GET.get('type')
+    custom = request.GET.get('custom')
+    medrec = get_object_or_404(MedicalRecord,id=id)
+    medrec.permission = perm    
+    if perm == 'custom':
+        medrec.access = custom
+    else:
+        medrec.access = ''
+    medrec.save()
+    return HttpResponse('success')
 
 def logout_view(request):
     logout(request)
