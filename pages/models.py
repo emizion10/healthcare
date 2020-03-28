@@ -1,5 +1,5 @@
 from django.db import models
-from django_mysql.models import ListTextField
+from django_mysql.models import ListTextField,ListCharField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.admin.widgets import AdminDateWidget
 import uuid 
@@ -164,3 +164,41 @@ class MedicalRecord(models.Model):
     
 	def __str__(self):
 		return u'%s  %s' % (self.patient_id, self.id)
+
+
+class Review(models.Model):
+    rating = models.IntegerField(blank=False)
+    description = models.TextField(blank=True)
+    author = models.ForeignKey(Patient, verbose_name="patient",on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, verbose_name="doctor",on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return u'%s  %s' % (self.doctor, self.id)
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=100,blank=True)
+    content = models.TextField(blank=True)
+    image=models.ImageField(upload_to='posts/',blank=True,null=True)
+    author = models.ForeignKey(Doctor,on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True)
+    likes = models.IntegerField(default=0)
+    dislikes = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return self.title
+    
+    
+PREFERENCE_CHOICES = (
+	(1,'like'),
+	(0,'dislike')
+)
+class Preference(models.Model):
+    user = models.ForeignKey(MyUser,on_delete=models.CASCADE)
+    post = models.ForeignKey(Post,on_delete=models.CASCADE)
+    value = models.IntegerField(choices=PREFERENCE_CHOICES)
+    date = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return str(self.user) + ':' + str(self.post) +':' + str(self.value)
+    

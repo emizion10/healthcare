@@ -1,16 +1,17 @@
 {% extends 'pages/base.html' %}
-{% block title %}Home Page{% endblock %}
+{% load crispy_forms_tags %}
+{% block title %}My Posts{% endblock %}
 
 {% block content %}
 
-
 <div class="container">
+<button>
+<a href="{% url 'addpost' %}">New Post</a>
+</button>
+
 {% for post in posts %}
 <h2>{{post.title}}</h2>
-<a href="{% url 'postdetail' pk=post.pk %}">View More</a>
-<br>
 
 {% endfor %}
 </div>
-
 {% endblock %}

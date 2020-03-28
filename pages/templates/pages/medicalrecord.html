@@ -10,8 +10,9 @@
 {% for i in record.prescription %}
 <h3>{{i}} </h3>
 {% endfor %}
+<a href="{% url 'viewdoctor' slug=record.doctor_id %}">
 <h3>{{record.doctor_id}} </h3>
-
+</a>
 
 {% if user.user_type == 1 %}
 
@@ -21,7 +22,7 @@
     <option value="custom">Custom</option>
 
 </select>
-<button onclick="change()" class="success" >Save</button>
+<button type="button" onclick="change()" class="success" >Save</button>
 <br>
 <input id='custom' type="text">
 {% endif %}

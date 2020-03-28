@@ -89,18 +89,19 @@
                       {% elif user.user_type == 2 %}
                       <li><a href="{% url 'addp' %}">Patient Registration</a></li>
                       <li><a href="{% url 'doctorprofile' %}">Profile</a></li>
+
+                      <li><a href="#">Dashboard <i class="ti-angle-down"></i></a>
+                        <ul class="submenu">
+                          <li><a href="{% url 'myposts' %}">Posts</a></li>
+                          <li><a href="about.html">Patients</a></li>
+                        </ul>
+                      </li>
                       {% elif user.user_type == 1 %}
                       <li><a href="{% url 'patientprofile' %}">Profile</a></li>
                       {% endif %}
 
 
 
-                      <li><a href="#">pages <i class="ti-angle-down"></i></a>
-                        <ul class="submenu">
-                          <li><a href="elements.html">elements</a></li>
-                          <li><a href="about.html">about</a></li>
-                        </ul>
-                      </li>
                       {% if user.is_authenticated %}
                       <li> <a href="{% url 'logout' %}"> Logout</a></li>
                       {% else %}

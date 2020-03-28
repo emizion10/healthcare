@@ -1,0 +1,16 @@
+{% extends 'pages/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}New Post{% endblock %}
+
+{% block content %}
+
+
+
+<form method='POST' enctype="multipart/form-data">
+     {% csrf_token %}
+     {{ form|crispy }}
+     <input type="submit" value="save">
+</form>
+
+
+{% endblock %}

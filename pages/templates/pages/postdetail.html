@@ -1,0 +1,33 @@
+{% extends 'pages/base.html' %}
+{% block title %}Post{% endblock %}
+
+{% block content %}
+
+
+<div class="container">
+
+    <h3>{{post.title}}</h3>
+    <h3>{{post.content}}</h3>
+
+    {% if preference.value == 1 %}
+    <a href="#" ">Liked</a> {{post.likes}}   |   <a href="#" onClick="document.getElementById('dislikebutton').submit()">Dislike This Post</a> {{post.dislikes}}
+    {% elif preference.value == 0 %}
+    <a href="#" onClick="document.getElementById('likebutton').submit()">Like This Post</a> {{post.likes}}   |   <a href="#" ">Disliked</a> {{post.dislikes}}
+    {% else %}
+    <a href="#" onClick="document.getElementById('likebutton').submit()">Like This Post</a> {{post.likes}}   |   <a href="#" onClick="document.getElementById('dislikebutton').submit()">Dislike This Post</a> {{post.dislikes}}
+    {% endif %}
+
+    <form id="likebutton" method="POST" action="{% url 'postpreference' pk=post.id value=1 %}">
+    {% csrf_token %}
+    <input type="hidden">
+    </form>
+    
+    <form id="dislikebutton" method="POST" action="{% url 'postpreference' pk=post.id value=0 %}">
+    {% csrf_token %}
+    <input type="hidden">
+    </form>
+
+</div>
+
+
+{% endblock %}

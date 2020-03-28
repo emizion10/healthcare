@@ -18,6 +18,17 @@ urlpatterns = [
     path('treatpatient/medicalrecord',views.addmedicalrecord, name='addmedicalrecord'),
     path('medicalrecord/<int:pk>',MedicalRecordDetail.as_view(), name='medicalrecord'),
     path('medicalrecord/editpermission/',views.editpermission, name='editpermission'),
+    path('viewdoctor/<slug:slug>',ViewDoctor.as_view(), name='viewdoctor'),
+    path('doctorreview/',views.addreview, name='doctorreview'),
+    path('myposts/',DoctorPosts.as_view(), name='myposts'),
+    path('addpost/',views.addpost, name='addpost'),
+    path('postdetail/<int:pk>',PostDetail.as_view(), name='postdetail'),
+    path('postdetail/<int:pk>/preference/<int:value>',views.postpreference, name='postpreference'),
+    
+    
+    
+    
+    
     
     
     

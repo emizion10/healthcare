@@ -11,9 +11,11 @@ from . decorators import *
 from easy_pdf.views import PDFTemplateView, PDFTemplateResponseMixin
 from django.db.models import Q
 
+
 @login_required(login_url='login')
 def home(request):
-    return render(request, 'pages/home.html')
+    pt = Post.objects.filter()
+    return render(request, 'pages/home.html',{'posts':pt})
 
 
 def index(request):
@@ -152,10 +154,10 @@ class PatientProfile(MyPermissionMixin, DetailView):
 
     def get_object(self):
         return get_object_or_404(Patient, username=self.request.user)
-    
-    def get_context_data(self,**kwargs):
+
+    def get_context_data(self, **kwargs):
         context = super(PatientProfile, self).get_context_data(**kwargs)
-        pt = get_object_or_404(Patient,username = self.request.user)
+        pt = get_object_or_404(Patient, username=self.request.user)
         context['records'] = MedicalRecord.objects.filter(patient_id=pt)
         return context
 
@@ -209,10 +211,11 @@ def treatpatientprofile(request):
         request.session['regid'] = request.POST['regid']
         reg = request.POST['regid']
         pt = get_object_or_404(Patient, regid=reg)
-        doc = get_object_or_404(Doctor,username = request.user)
-        
-        rec = MedicalRecord.objects.filter(Q(permission='public')|Q(doctor_id=doc)|Q(access__iregex = r'('+str(doc.dname)+'),?'))
-        return render(request, 'pages/patientprofile.html', {'patient': pt,'records':rec})
+        doc = get_object_or_404(Doctor, username=request.user)
+
+        rec = MedicalRecord.objects.filter(Q(permission='public') | Q(
+            doctor_id=doc) | Q(access__iregex=r'('+str(doc.dname)+'),?'))
+        return render(request, 'pages/patientprofile.html', {'patient': pt, 'records': rec})
 
 
 @user_is_doctor
@@ -228,15 +231,17 @@ def addmedicalrecord(request):
                 Patient, regid=request.session['regid'])
             medrecord.save()
             pt = get_object_or_404(Patient, regid=request.session['regid'])
-            doc = get_object_or_404(Doctor,username=request.user)
-            rec = MedicalRecord.objects.filter(Q(permission='public')|Q(doctor_id=doc)|Q(access__iregex = r'('+str(doc.dname)+'),?'))
-            return render(request, 'pages/patientprofile.html', {'patient': pt,'records':rec})
+            doc = get_object_or_404(Doctor, username=request.user)
+            rec = MedicalRecord.objects.filter(Q(permission='public') | Q(
+                doctor_id=doc) | Q(access__iregex=r'('+str(doc.dname)+'),?'))
+            return render(request, 'pages/patientprofile.html', {'patient': pt, 'records': rec})
     else:
         form = MedicalRecordForm()
 
     return render(request, 'pages/addmedicalrecord.html', {'forms': form})
 
-class MedicalRecordDetail(MyPermissionMixin,DetailView):
+
+class MedicalRecordDetail(MyPermissionMixin, DetailView):
     raise_exception = True
     login_url = "/login/"
     model = MedicalRecord
@@ -247,20 +252,142 @@ class MedicalRecordDetail(MyPermissionMixin,DetailView):
     def test_func(self):
         return (self.request.user.user_type == 2 or self.request.user.user_type == 1)
 
-    
+
 @user_is_patient
 def editpermission(request):
     id = request.GET.get('id')
     perm = request.GET.get('type')
     custom = request.GET.get('custom')
-    medrec = get_object_or_404(MedicalRecord,id=id)
-    medrec.permission = perm    
+    medrec = get_object_or_404(MedicalRecord, id=id)
+    medrec.permission = perm
     if perm == 'custom':
         medrec.access = custom
     else:
         medrec.access = ''
     medrec.save()
     return HttpResponse('success')
+
+
+class ViewDoctor(MyPermissionMixin, DetailView):
+    raise_exception = True
+    login_url = "/login/"
+    context_object_name = 'doctor'
+
+    def get_object(self, *args, **kwargs):
+        self.request.session['doctor'] = self.kwargs['slug']
+        return get_object_or_404(Doctor, dname=self.kwargs['slug'])
+
+    template_name = 'pages/doctorprofile.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 1)
+
+
+@user_is_patient
+def addreview(request):
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.doctor = get_object_or_404(
+                Doctor, dname=request.session['doctor'])
+            review.author = get_object_or_404(
+                Patient, username=request.user)
+            review.save()
+            doc = get_object_or_404(Doctor, dname=request.session['doctor'])
+            return render(request, 'pages/doctorprofile.html', {'doctor': doc, })
+    else:
+        form = ReviewForm()
+
+    return render(request, 'pages/doctorreview.html', {'form': form})
+
+
+class DoctorPosts(MyPermissionMixin, ListView):
+    raise_exception = True
+    login_url = "/login/"
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        dt = get_object_or_404(Doctor, username=self.request.user)
+        queryset = Post.objects.filter(author=dt)
+        return queryset
+
+    template_name = 'pages/myposts.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 2)
+
+
+@user_is_doctor
+def addpost(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = get_object_or_404(
+                Doctor, username=request.user)
+            post.save()
+            dt = get_object_or_404(Doctor, username=request.user)
+            pt = Post.objects.filter(author=dt)
+            return render(request, 'pages/myposts.html', {'posts': pt, })
+    else:
+        form = PostForm()
+
+    return render(request, 'pages/addpost.html', {'form': form})
+
+
+
+class PostDetail(MyPermissionMixin, DetailView):
+    raise_exception = True
+    login_url = "/login/"
+    context_object_name = 'post'
+    model = Post
+
+
+
+    def get_context_data(self, **kwargs):
+        context = super(PostDetail, self).get_context_data(**kwargs)
+        post = get_object_or_404(Post,id=self.kwargs['pk'])
+        pre = Preference.objects.filter(user=self.request.user).filter(post=self.kwargs['pk'])
+        if pre:
+        	context['preference'] = get_object_or_404(Preference,post=post,user=self.request.user)
+        
+            
+        return context
+
+    template_name = 'pages/postdetail.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 1 or self.request.user.user_type==2)
+
+@login_required(login_url='login')
+def postpreference(request,**kwargs):
+    post = get_object_or_404(Post,id=kwargs['pk'])
+    
+    pre = Preference.objects.filter(user=request.user).filter(post=kwargs['pk'])
+    if pre:
+        pref = get_object_or_404(Preference,user=request.user,post=post)
+        if kwargs['value']==1:
+            post.likes = post.likes + 1
+            post.dislikes = post.dislikes - 1
+        else:
+            post.dislikes = post.dislikes + 1
+            post.likes = post.likes - 1
+        
+        pref.value = kwargs['value']
+        pref.save()
+    else:
+        if kwargs['value']==1:
+            post.likes = post.likes + 1
+        else:
+            post.dislikes = post.dislikes + 1
+            
+        Preference.objects.create(user=request.user,post=post,value=kwargs['value'])
+    
+    pref = get_object_or_404(Preference,user=request.user,post=post)
+    post.save()
+    return render(request,'pages/postdetail.html',{'post':post,'preference':pref})
+
 
 def logout_view(request):
     logout(request)

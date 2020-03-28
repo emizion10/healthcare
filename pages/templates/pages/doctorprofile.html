@@ -4,9 +4,17 @@
 {% block content %}
 
 
+{% if user.user_type == 1 %}
+
+<div class="container">
+<a href="{% url 'doctorreview' %}">Add a Review</a>
+{% elif user.user_type == 2 %}
+
+{% endif %}
+<br><br>
 <h2>{{doctor.dname}}</h2>
 <h2>{{doctor.regid}}</h2>
 
-
+</div>
 
 {% endblock %}
