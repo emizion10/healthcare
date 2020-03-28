@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import *
 from django.contrib.auth import authenticate
 
+
 GENDER_CHOICES = (
     (0, 'male'),
     (1, 'female'),
@@ -87,7 +88,7 @@ class DoctorForm(forms.ModelForm):
 
                     )
 
-    username = forms.CharField(max_length=60, label='Username')
+    us = forms.CharField(max_length=60, label='Username')
     password = forms.CharField(widget=forms.PasswordInput, label='Password')
     regid = forms.CharField(max_length=60, label='Registration No.')
     dname = forms.CharField(max_length=100, label='Name')
@@ -100,12 +101,10 @@ class DoctorForm(forms.ModelForm):
     hos = forms.CharField(max_length=150, required=False,
                           label='Hospital Name')
     imagefile = forms.ImageField(required=False, label='Upload Image')
-    # phno = forms.CharField(max_length=20)
-
     class Meta():
-        model = MyUser
-        fields = ('username', 'password', 'regid', 'dname',
-                  'dob', 'gender', 'spec', 'hos', 'imagefile')
+        model = Doctor
+        fields = ('us', 'password', 'regid', 'dname',
+                  'dob', 'gender', 'spec', 'hos', 'imagefile','location')
 
     def clean_regid(self):
         if Doctor.objects.filter(regid__iexact=self.cleaned_data['regid']):
@@ -132,4 +131,5 @@ class PostForm(forms.ModelForm):
     class Meta():
         model = Post
         fields = ('title','content','image')
+        
         

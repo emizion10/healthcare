@@ -3,6 +3,8 @@ from django_mysql.models import ListTextField,ListCharField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.admin.widgets import AdminDateWidget
 import uuid 
+from places.fields import PlacesField
+
 
 GENDER_CHOICES = (
     (0, 'male'),
@@ -115,6 +117,8 @@ class Doctor(models.Model):
 	spec=models.CharField(max_length=50,blank=True)
 	hos=models.CharField(max_length=150,blank=True)
 	imagefile=models.ImageField(upload_to='doctor/',default="default.jpg",blank=True,null=True)
+	location = PlacesField()
+	
 
 	# city = models.CharField(max_length=255)
 	# location = LocationField(based_fields=['city'], zoom=7, default=Point(1.0, 1.0))
@@ -135,10 +139,8 @@ class Hospital(models.Model):
 	email=models.EmailField(blank=True)
 	url=models.URLField(blank=True)
 	imagefile=models.ImageField(upload_to='hospital/',blank=True,null=True)
-	# city = models.CharField(max_length=255)
-	# location = LocationField(based_fields=['city'], zoom=7, default=Point(1.0, 1.0))
-	# loc=LocationField()
-
+	location = PlacesField()
+	
 	def __str__(self):
 		return self.name
 
@@ -212,3 +214,6 @@ class Comments(models.Model):
     
 	def __str__(self):
 		return str(self.post) +':'+str(self.author)+':'+str(self.id)
+
+
+

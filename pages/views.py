@@ -111,25 +111,24 @@ class AddDoctor(MyPermissionMixin, CreateView):
         return (self.request.user.user_type == 3)
 
     def form_valid(self, form):
-        usr = form.save(commit=False)
-        username = form.cleaned_data['username']
-        regid = form.cleaned_data['regid']
-        dname = form.cleaned_data['dname']
-        gender = form.cleaned_data['gender']
-        dob = form.cleaned_data['dob']
-        spec = form.cleaned_data['spec']
-        hos = form.cleaned_data['hos']
+        doc = form.save(commit=False)
+        username = form.cleaned_data['us']
+
+        
         imagefile = self.request.FILES['imagefile'] if 'imagefile' in self.request.FILES else False
         if imagefile == False:
             imagefile = 'default.jpg'
         password = form.cleaned_data['password']
+
+        usr = MyUser.objects.create()
+        usr.username = username
         usr.set_password(password)
-        usr.user_type = 2
+        usr.user_type=2
         usr.save()
+        doc.username=usr
+        doc.save()
 
-        Doctor.objects.create(username=usr, regid=regid, dname=dname,
-                              gender=gender, dob=dob, spec=spec, hos=hos, imagefile=imagefile)
-
+       
         return super(AddDoctor, self).form_valid(form)
 
 

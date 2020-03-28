@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'easy_pdf',
-    'qr_code'
+    'qr_code',
+    'places',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +141,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 
+PLACES_MAPS_API_KEY='AIzaSyBKzjwtu-tyyJQtPP3rFPxPRCgtZHgmKfs'
