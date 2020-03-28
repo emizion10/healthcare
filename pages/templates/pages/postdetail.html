@@ -17,6 +17,16 @@
     <a href="#" onClick="document.getElementById('likebutton').submit()">Like This Post</a> {{post.likes}}   |   <a href="#" onClick="document.getElementById('dislikebutton').submit()">Dislike This Post</a> {{post.dislikes}}
     {% endif %}
 
+    <h2>Comments</h2>
+    <form method="POST" action="{% url 'addcomment' pk=post.id %}">
+        {% csrf_token %}
+        <label>Text:</label>
+        <input type="text" name="comment">
+        <input type="submit" value="Comment">
+    </form>
+    {% for c in comments %}
+    <h3>{{c.comment}} |{{c.author}} </h3>
+    {% endfor %}
     <form id="likebutton" method="POST" action="{% url 'postpreference' pk=post.id value=1 %}">
     {% csrf_token %}
     <input type="hidden">

@@ -24,6 +24,8 @@ urlpatterns = [
     path('addpost/',views.addpost, name='addpost'),
     path('postdetail/<int:pk>',PostDetail.as_view(), name='postdetail'),
     path('postdetail/<int:pk>/preference/<int:value>',views.postpreference, name='postpreference'),
+    path('postdetail/<int:pk>/addcomment',views.addcomment, name='addcomment'),
+    
     
     
     

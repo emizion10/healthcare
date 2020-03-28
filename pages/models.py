@@ -202,3 +202,13 @@ class Preference(models.Model):
     def __str__(self):
         return str(self.user) + ':' + str(self.post) +':' + str(self.value)
     
+    
+class Comments(models.Model):
+	id=models.BigAutoField(primary_key=True)
+	comment = models.CharField(max_length=140,blank=True)
+	post = models.ForeignKey(Post,on_delete=models.CASCADE)
+	author = models.ForeignKey(MyUser,on_delete=models.CASCADE)
+	date = models.DateTimeField(auto_now_add=True)
+    
+	def __str__(self):
+		return str(self.post) +':'+str(self.author)+':'+str(self.id)

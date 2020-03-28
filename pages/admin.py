@@ -23,6 +23,8 @@ admin.site.register(MedicalRecord)
 admin.site.register(Review)
 admin.site.register(Post)
 admin.site.register(Preference)
+admin.site.register(Comments)
+
 
 
 

@@ -352,7 +352,7 @@ class PostDetail(MyPermissionMixin, DetailView):
         if pre:
         	context['preference'] = get_object_or_404(Preference,post=post,user=self.request.user)
         
-            
+        context['comments'] = Comments.objects.filter(post=post)   
         return context
 
     template_name = 'pages/postdetail.html'
@@ -386,7 +386,26 @@ def postpreference(request,**kwargs):
     
     pref = get_object_or_404(Preference,user=request.user,post=post)
     post.save()
-    return render(request,'pages/postdetail.html',{'post':post,'preference':pref})
+    comments = Comments.objects.filter(post=post)
+    return render(request,'pages/postdetail.html',{'post':post,'preference':pref,'comments':comments})
+
+
+@login_required(login_url='login')
+def addcomment(request,**kwargs):
+    if request.method == 'POST':
+        comment = request.POST.get('comment')
+        post = get_object_or_404(Post,id=kwargs['pk'])
+        Comments.objects.create(comment=comment,post=post,author=request.user)
+        
+        pre = Preference.objects.filter(user=request.user).filter(post=kwargs['pk'])
+        if pre:
+        	pref = get_object_or_404(Preference,user=request.user,post=post)
+        else:
+            pref={}
+        comments = Comments.objects.filter(post=post)
+        return render(request,'pages/postdetail.html',{'post':post,'preference':pref,'comments':comments})
+        
+        
 
 
 def logout_view(request):
