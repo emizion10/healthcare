@@ -1,27 +1,200 @@
 {% extends 'pages/base.html' %}
 {% block title %}Profile{% endblock %}
 
+{% block script %}
+<style>
+    * {
+  box-sizing: border-box;
+  -webkit-transition: 0.3s cubic-bezier(0.75, 0, 0.2, 1), color 0.3s ease;
+  transition: 0.3s cubic-bezier(0.75, 0, 0.2, 1), color 0.3s ease;
+}
+.rela-block {
+  display: block;
+  position: relative;
+  margin: auto;
+}
+.floated {
+  display: inline-block;
+  position: relative;
+  margin: false;
+  /* top: ;
+  left: ;
+  right: ;
+  bottom: ; */
+  /* float: left; */
+}
+.floated.right {
+  float: right;
+}
+.abs-center {
+  display: false;
+  position: absolute;
+  margin: false;
+  top: 50%;
+  left: 50%;
+  right: false;
+  bottom: false;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  text-align: center;
+  width: 88%;
+}
+.vert-center {
+  display: false;
+  position: absolute;
+  margin: false;
+  top: 50%;
+  
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+}
+.horz-center {
+  display: false;
+  position: absolute;
+  margin: false;
+  top: false;
+  left: 50%;
+  right: false;
+  bottom: false;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+}
+.overlay-card {
+  height: 75vh;
+  min-height: 400px;
+  width: calc(92% - 40px);
+  max-width: 1086px;
+  padding-left: 30px;
+  background-color: #f4f4f4;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.profile-card {
+  width: calc(100% - 40px);
+  padding-top: 100px;
+  margin: 70px auto 30px;
+  background-color: #fff;
+  box-shadow: 0 2px 6px -2px rgba(0,0,0,0.26);
+}
+.profile-pic {
+  display: false;
+  position: absolute;
+  margin: false;
+  top: -90px;
+  left: 50%;
+  right: false;
+  bottom: false;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  height: 180px;
+  width: 180px;
+  border: 10px solid #fff;
+  border-radius: 100%;
+  background: url("{{ patient.imagefile.url }}") center no-repeat;
+  background-size: cover;
+}
+.profile-name-container {
+  margin: 0 auto 10px;
+  padding: 10px;
+  text-align: center;
+}
+.user-name {
+  font-family: "Montserrat";
+  font-size: 24px;
+  letter-spacing: 3px;
+  font-weight: 400;
+  line-height: 30px;
+  margin-bottom: 12px;
+}
+.user-desc {
+  letter-spacing: 1px;
+  color: #999;
+}
+.profile-card-stats {
+  height: 75px;
+  padding: 10px 0px;
+  text-align: center;
+  overflow: hidden;
+}
+.profile-stat {
+  height: 100%;
+  width: 33.3333%;
+}
+.profile-stat:after {
+  color: #999;
+}
+
+
+  .profile-card-stats {
+    height: 0;
+    padding: 0px;
+  }
+  .profile-pic {
+    height: 140px;
+    width: 140px;
+    top: -70px;
+  }
+  .profile-card {
+    padding-top: 70px;
+    margin: 50px auto 30px;
+  }
+
+
+</style>
+{% endblock %}
+
 {% block content %}
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
+    rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<link
+    href="https://fonts.googleapis.com/css?family=Montserrat|Roboto:300,400|Yellowtail"
+    rel="stylesheet">
+
 
 {% if user.user_type == 1 %}
-
-<a href="{% url 'medicalcard' %}">Medical Card</a>
+<button style="float:right;"  class="btn-success">
+<a  class="button btn-success" style="float: right;" href="{% url 'medicalcard' %}">Medical Card</a>
+</button>
 {% elif user.user_type == 2 %}
-<a href="{% url 'addmedicalrecord' %}">Add Medical Record</a>
-
+<button style="float:right;"  class="btn-success">
+    <a  class="button btn-success" style="float: right;" href="{% url 'addmedicalrecord' %}">Add Medical Record</a>
+    </button>
 {% endif %}
-<h1>PROFILE</h1>
-<h2>{{patient.name}}</h2>
-<h2>{{patient.age}}</h2>
-<h2>{{patient.bloodgroup}}</h2>
-<br><br>
-<h1>MEDICAL RECORDS</h1>
-{% for rec in records %}
-<a href="{% url 'medicalrecord' pk=rec.pk %}">
-    <h3>{{rec.condition}} | {{rec.visit_date}}</h3>
-</a>
+<br>
+<div class="rela-block profile-card">
+    <div class="profile-pic" id="profile_pic">
 
-{% endfor %}
+    </div>
+    <div class="rela-block profile-name-container">
+        <div class="rela-block user-name" id="user_name">{{patient.pname}}</div>
+        <div class="rela-block user-desc" id="user_description">{{patient.get_gender_display}}</div><br>
+        <div class="rela-block user-desc" id="user_description">Age :{{patient.age}}</div><br>
+        <div class="rela-block user-desc" id="user_description">Date of Birth :{{patient.dob}}</div><br>
+        <div class="rela-block user-desc" id="user_description">BloodGroup :{{patient.get_bloodgroup_display}}</div><br>
+        
+        <br>
+        <div class="rela-block user-name" id="user_name">Medical Records</div>
+        {% for rec in records %}
+        <a href="{% url 'medicalrecord' pk=rec.pk %}">
+            <h3>{{rec.condition}} | {{rec.visit_date}}</h3>
+        </a>
+        {% endfor %}
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
 
 
 {% endblock %}

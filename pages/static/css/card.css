@@ -1,0 +1,139 @@
+body{
+    background: #ddd8d8;
+}
+
+form {
+    position: relative;
+    /* display: block; */
+    /* background: rgb(133, 173, 173); */
+    background: rgb(235, 235, 224);
+    background-image: url("/media/img/ind.jpeg");
+    background-position: 25px 15px;
+    /* border: 3px solid rgb(71, 107, 107); */
+    border: 3px solid #d3d3d3;
+    width: 100%;
+    height: 100%;
+    /* margin: 0,2; */
+    border-radius: 19px;
+    
+    /* z-index: -1; */
+   
+}
+
+    
+
+
+label{
+    padding-left: 25px;
+    padding-bottom: 8px;
+    display: block;
+    /* display:none; */
+    /* color: #962390; */
+    color: black;
+    font-weight: bolder;
+}
+.id_label{
+    /* padding-left: 320px; */
+    /* display: block; */
+    /* display:none; */
+    /* color: #962390; */
+    color: rgb(179, 59, 59);
+    font-weight: bolder;
+    font-size: 40px;
+}
+
+.div_class{
+    position: relative;
+    /* display: block; */
+    /* padding-left: 30%; */
+    /* padding-top: 10%; */
+    /* margin: 50px,auto; */
+    /* margin: 50,30; */
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 130px;
+    margin-bottom:80px;
+    width :550px;
+    /* height :320px; */
+    height: 100%;
+    
+}
+   
+.form_div_class{
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top:10px;
+    margin-bottom:1px;
+    
+}
+.form_div_class_signup{
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom:20px;
+    
+}
+
+
+.imgdiv{
+    display: inline-block;
+    background-color: rgb(247, 0, 255);
+    width: 120px;
+    height: 120px;
+    margin-left : 5%;
+    margin-top: 15px;
+}
+
+
+.row { 
+    display: flex;
+    flex-wrap: wrap;
+    
+}
+
+/* Create two unequal columns that sits next to each other */
+/* Sidebar/left column */
+.side {
+    flex: 40%; /* Set the width of the sidebar */
+    /* background-color:#d3d3d3; Grey background color */
+    padding: 10px; /* Some padding */
+
+}
+
+/* Main column */
+.main { 
+    flex: 60%; /* Set the width of the main content */
+    /* background-color: #f1f1f1; White background color */
+    padding: 15px; /* Some padding */
+}
+
+.side1 {
+    flex: 50%; /* Set the width of the sidebar */
+    /* background-color:#d3d3d3; Grey background color */
+    /* padding: 10px; Some padding */
+
+}
+
+/* Main column */
+.main1 { 
+    flex: 50%; /* Set the width of the main content */
+    /* background-color: #f1f1f1; White background color */
+    /* padding: 15px; Some padding */
+}
+.other_input{
+    width: 100%;
+    /* margin-right: 10%; */
+    display: inline-block;
+    display: flex;
+    flex-wrap: wrap;/* Set the width of the sidebar */
+    /* background-color:#d3d3d3; Grey background color */
+    padding: 10px; /* Some padding */
+
+}
+hr{
+    border-width: 2px;
+    border-style: solid;
+    color: rgb(255, 26, 26);
+}

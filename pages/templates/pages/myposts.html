@@ -5,13 +5,26 @@
 {% block content %}
 
 <div class="container">
-<button>
-<a href="{% url 'addpost' %}">New Post</a>
-</button>
+    <div class="row">
+        <div class="col-sm-6"><h2> Posts</h2></div>
+        <div class="col-sm-6">
+            <a style="float: right;" class="btn btn-danger" type="button"
+                href="{% url 'addpost' %}">New
+                Post</a>
+        </div>
+    </div>
 
-{% for post in posts %}
-<h2>{{post.title}}</h2>
+    <br>
+    <div class="row">
+    {% for post in posts %}
 
-{% endfor %}
+        <div class="col-xs-12 col-sm-6 col-md-4">
+            <h2>{{post.title}}</h2>
+            <h3>{{post.content|truncatewords:30}}</h3>
+
+        </div>
+    {% endfor %}
+
+    </div>
 </div>
 {% endblock %}

@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
-    'easy_pdf',
     'qr_code',
     'places',
 ]
@@ -76,7 +75,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'trial.wsgi.application'
 
-
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 

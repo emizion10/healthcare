@@ -1,0 +1,100 @@
+
+{% load static %}
+{% load qr_code %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+         Medical Card
+        </title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+        <link rel="stylesheet" href="{% static 'css/card.css' %}">
+        <script src="https://kendo.cdn.telerik.com/2017.2.621/js/jquery.min.js"></script> 
+        <script src="https://kendo.cdn.telerik.com/2017.2.621/js/jszip.min.js"></script>
+        <script src="https://kendo.cdn.telerik.com/2017.2.621/js/kendo.all.min.js"></script>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+
+    <body>
+        <br>
+        <br>
+        <center>
+        <button class="btn btn-success" onclick="ExportPdf()">Download</button>
+
+        </center>
+
+
+        <div id='myCanvas'>
+
+            <div class="div_class">
+                <form>
+                    <div class="form_div_class">
+
+                        <div id="div1">
+                            <div align="center">
+                                <img src="/media/img/head2.png" height="65px"
+                                    width="350px"></div>
+                            <div class="row">
+
+                                <div class='imgdiv' class='side' align='left'
+                                    style='background-color: rgb(235, 235, 224);
+                                    border-radius:2px; border: 2px solid #000; width: 120px; height: 120px;'>
+                                    <img src='{{patient.imagefile.url}} ' height='120' width='120' />
+                                    </div>
+
+
+                                <div class='main'> <label> Full Name &nbsp &nbsp
+                                &nbsp &nbsp : {{patient.pname}}</label>
+
+                                    <label> Date of Birth : {{patient.dob}} </label>
+                                    <label> Blood Group : {{patient.get_bloodgroup_display}} </label>
+                                    <br>
+                                    <div style="float: right;">
+                                    {% qr_from_text patient.regid size="4" image_format="png" error_correction="L" %}
+                                </div>
+
+                                </div>
+                            </div>
+                            <div class='other_input'>
+
+                                <div class='side1'>
+                                    <div class='main1'><label class='id_label'></label></div>
+                                </div>
+
+                            </div>
+
+
+
+                        </form>
+                    </div>
+
+
+                </div>
+          
+
+    </body>
+    <script type="text/javascript">
+
+
+
+
+     function ExportPdf(){ 
+kendo.drawing
+    .drawDOM("#myCanvas", 
+    { 
+        paperSize: "A4",
+        margin: { top: "1cm", bottom: "1cm" },
+        scale: 0.8,
+        height: 500
+    })
+        .then(function(group){
+        kendo.drawing.pdf.saveAs(group, "medical_card.pdf")
+    });
+}
+
+
+        </script>
+</html>

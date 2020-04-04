@@ -1,16 +1,24 @@
 {% extends 'pages/base.html' %}
 {% block title %}Patient{% endblock %}
 {% load static %}
+{% load qr_code %}
 
 {% block script %}
+<style>
+  #pop {
+    display: none;
+}
+  </style>
+
 
 <script type="text/javascript" src="{% static '/js/instascan.min.js' %}"></script>
-
 
 
 <script type="text/javascript">
 
     function scancode(){
+
+      document.getElementById("pop").style.display="initial";
     
     let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
     scanner.addListener('scan', function (content) {
@@ -18,12 +26,7 @@
       pid = content;
         document.getElementById('pid').value = content;
 
-    //   $.get('patient',{'regid':content}, function(data){
-    //     var code = "<h2>"+data[0].pname+"</h2>";
-    //     $('#scan').hide();
-    //     $('#profile').html(code);
-    
-    // });
+
 
     scanner.stop();
     $('#scanform').submit();
@@ -50,9 +53,10 @@
 {% endblock %}
 {% block content %}
 
-<div id="scan">
-    <button  onclick="scancode()">Scan Health Card</a>
-
+<div  id="scan">
+  <center>
+    <button class="btn btn-danger"  onclick="scancode()">Scan Health Card</a>
+    </center>
 </div>
 
 <form id='scanform' method="POST" action="patient">
@@ -62,13 +66,37 @@
 
 <div id="profile"></div>
 
+<br>
+<center>
+  <div id=pop>
+    <video id="preview"></video>
+  </div>
+</center>
 
 
 <center>
-    <video id="preview"></video>
+{% qr_from_text 'healthchain' size="10" image_format="png" error_correction="L" %}
 </center>
+
 
 
 
 {% endblock %}
 
+{%  block endscript %}
+
+<script>
+  function myFunction() {
+  var popup = document.getElementById("myPopup");
+  popup.classList.toggle("show");
+  
+  if (popup.paused){ 
+      popup.play(); 
+      }
+    else{ 
+      popup.pause();
+      }
+   
+  }
+  </script>
+{% endblock %}

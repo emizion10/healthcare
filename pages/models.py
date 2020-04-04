@@ -7,8 +7,8 @@ from places.fields import PlacesField
 
 
 GENDER_CHOICES = (
-    (0, 'male'),
-    (1, 'female'),
+    (0, 'Male'),
+    (1, 'Female'),
     (2, 'not specified'),
 )
 

@@ -4,13 +4,21 @@
 {% block content %}
 
 
-<div class="container">
-{% for post in posts %}
-<h2>{{post.title}}</h2>
-<a href="{% url 'postdetail' pk=post.pk %}">View More</a>
-<br>
+<div class="row">
+    {% for post in posts %}
 
-{% endfor %}
-</div>
+        <div class="col-xs-12 col-sm-6 col-md-6">
+            <h2>{{post.title}}</h2>
+            <h3>{{post.content|truncatewords:30}}
+
+<a href="{% url 'postdetail' pk=post.pk %}">View More</a>
+
+            </h3>
+
+
+        </div>
+    {% endfor %}
+
+    </div>
 
 {% endblock %}

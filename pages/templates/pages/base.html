@@ -9,23 +9,15 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- <link rel="manifest" href="site.webmanifest"> -->
     <link rel="shortcut icon" type="image/x-icon" src="/media/img/favicon.png">
-    <!-- Place favicon.ico in the root directory -->
 
     <!-- CSS here -->
-    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
-    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/themify-icons.css' %}">
-    <link rel="stylesheet" href="{% static 'css/nice-select.css' %}">
-    <link rel="stylesheet" href="{% static 'css/flaticon.css' %}">
-    <link rel="stylesheet" href="{% static 'css/gijgo.css' %}">
-    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
-    <link rel="stylesheet" href="{% static 'css/slicknav.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <!-- <link rel="stylesheet" href="{% static 'css/responsive.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'css/themify-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'css/mystyle.css' %}">
+  
     <title>{% block title %} {% endblock %}</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
@@ -33,6 +25,10 @@
     
     {% block script %} {% endblock %}
   </head>
+
+
+<div id="container">
+
   <body>
 
     <header>
@@ -60,7 +56,7 @@
                         info@docmed.com</a></li>
                     {% if user.is_authenticated %}
 
-                    <li><a href="#"> <i class="fa fa-phone"></i> Welcome, {{ user.username }}. </a></li>
+                    <li><a href="#"> <i class="fa fa-user-circle-o "></i> Welcome, {{ user.username }}. </a></li>
                     {%endif%}
                   </ul>
                 </div>
@@ -74,7 +70,7 @@
               <div class="col-xl-3 col-lg-2">
                 <div class="logo">
                   <a href="#">
-                    <img src="/media/img/logo.png">
+                    <img src="/media/img/healthlogo.png"> 
                   </a>
                 </div>
               </div>
@@ -96,6 +92,7 @@
                           <li><a href="about.html">Patients</a></li>
                         </ul>
                       </li>
+
                       {% elif user.user_type == 1 %}
                       <li><a href="{% url 'patientprofile' %}">Profile</a></li>
                       {% endif %}
@@ -140,123 +137,49 @@
       </div>
     </header>
 
-    <br>
-    <br>
-    <br>
 
+    
+<div class="container">
   
     {% block content %}
     {% endblock %}
+  </div>
+<br><br><br><br>
 
-  
+  <footer id="footer">
+
+    
+
+    <div class="header-area">
+      <div class="header-top_area">
+        <div class="container">
+          <div class="row">
+            <div class="col-xl-6 col-md-6">
+            
+            </div>
+            <div class="col-xl-6 col-md-6">
+              <div class="short_contact_list">
+                <ul>
+                  <li><a href="#"> <i class="fa fa-envelope"></i>
+                      info@docmed.com</a></li>
+                  
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+     
+    </div>
+
+  </footer>
   </body>
+
+</div>
 
   {% block endscript %}
 
   {% endblock %}
 
-  <br>
-  <br>
-  <br>
 
-
-  <footer class="footer">
-    <div class="footer_top">
-      <div class="container">
-        <div class="row">
-          <div class="col-xl-4 col-md-6 col-lg-4">
-            <div class="footer_widget">
-              <div class="footer_logo">
-                <a href="#">
-                  <img src="/media/img/footer_logo.png" alt="">
-                </a>
-              </div>
-              <p>
-                Firmament morning sixth subdue darkness
-                creeping gathered divide.
-              </p>
-              <div class="socail_links">
-                <ul>
-                  <li>
-                    <a href="#">
-                      <i class="ti-facebook"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="ti-twitter-alt"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="fa fa-instagram"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-            </div>
-          </div>
-          <div class="col-xl-2 offset-xl-1 col-md-6 col-lg-3">
-            <div class="footer_widget">
-              <h3 class="footer_title">
-                Departments
-              </h3>
-              <ul>
-                <li><a href="#">Eye Care</a></li>
-                <li><a href="#">Skin Care</a></li>
-                <li><a href="#">Pathology</a></li>
-                <li><a href="#">Medicine</a></li>
-                <li><a href="#">Dental</a></li>
-              </ul>
-
-            </div>
-          </div>
-          <div class="col-xl-2 col-md-6 col-lg-2">
-            <div class="footer_widget">
-              <h3 class="footer_title">
-                Useful Links
-              </h3>
-              <ul>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Blog</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#"> Contact</a></li>
-                <li><a href="#"> Appointment</a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-xl-3 col-md-6 col-lg-3">
-            <div class="footer_widget">
-              <h3 class="footer_title">
-                Address
-              </h3>
-              <p>
-                200, D-block, Green lane USA <br>
-                +10 367 467 8934 <br>
-                docmed@contact.com
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="copy-right_text">
-      <div class="container">
-        <div class="footer_border"></div>
-        <div class="row">
-          <div class="col-xl-12">
-            <p class="copy_right text-center">
-              <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-              Copyright &copy;<script>document.write(new Date().getFullYear());</script>
-              All rights reserved | This template is made with <i class="fa
-                fa-heart-o" aria-hidden="true"></i> by <a href="#"
-                target="_blank">Colorlib</a>
-              <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
 </html>

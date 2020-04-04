@@ -8,7 +8,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import PermissionDenied
 from . decorators import *
-from easy_pdf.views import PDFTemplateView, PDFTemplateResponseMixin
+
 from django.db.models import Q
 
 
@@ -180,18 +180,20 @@ class HospitalProfile(MyPermissionMixin, DetailView):
         return (self.request.user.user_type == 3)
 
 
-class MedicalCard(PDFTemplateResponseMixin, DetailView):
+class MC(MyPermissionMixin, DetailView):
     raise_exception = True
     login_url = "/login/"
     context_object_name = 'patient'
-
+    
     def get_object(self):
-        return get_object_or_404(Patient, username=self.request.user)
+        return get_object_or_404(Patient, username=self.request.user)    
 
-    template_name = 'pages/medicalcard.html'
+    template_name = 'pages/mc.html'
 
     def test_func(self):
         return (self.request.user.user_type == 1)
+
+
 
 
 class TreatPatient(MyPermissionMixin, TemplateView):
