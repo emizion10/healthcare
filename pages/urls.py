@@ -25,6 +25,18 @@ urlpatterns = [
     path('postdetail/<int:pk>',PostDetail.as_view(), name='postdetail'),
     path('postdetail/<int:pk>/preference/<int:value>',views.postpreference, name='postpreference'),
     path('postdetail/<int:pk>/addcomment',views.addcomment, name='addcomment'),
+    path('followdoctor/<int:pk>/',views.followdoctor, name='followdoctor'),
+    path('unfollowdoctor/<int:pk>/',views.unfollowdoctor, name='unfollowdoctor'),
+    path('doctorlist/',DoctorList.as_view(), name='doctorlist'),
+    path('sendmessage/',views.sendmessage, name='sendmessage'),
+    path('viewmessage/',ViewMessage.as_view(), name='viewmessage'),
+    path('deletemessage/<int:pk>',views.deletemessage, name='deletemessage'),
+    
+    
+    
+    
+    
+    
     
     
     

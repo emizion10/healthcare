@@ -1,0 +1,26 @@
+{% extends 'pages/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Doctors{% endblock %}
+
+
+{% block content %}
+
+<h2>Following</h2>
+{% for doctor in doctor %}
+
+<a href="{% url 'viewdoctor' slug=doctor.dname %}">
+    <h2>{{doctor.dname}}</h2>
+</a>
+{% endfor %}
+
+<h2>Not Following</h2>
+{% for doc in unfollow %}
+
+<a href="{% url 'viewdoctor' slug=doc.dname %}">
+    <h2>{{doc.dname}}</h2>
+</a>
+{% endfor %}
+
+
+
+{% endblock %}

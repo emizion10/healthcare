@@ -24,6 +24,9 @@ admin.site.register(Review)
 admin.site.register(Post)
 admin.site.register(Preference)
 admin.site.register(Comments)
+admin.site.register(Follow)
+admin.site.register(Messages)
+
 
 
 

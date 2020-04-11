@@ -4,6 +4,9 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.admin.widgets import AdminDateWidget
 import uuid 
 from places.fields import PlacesField
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
 
 
 GENDER_CHOICES = (
@@ -51,6 +54,8 @@ class MyAccountManager(BaseUserManager):
 		return user
 
 
+
+
 class MyUser(AbstractBaseUser):
   
 	
@@ -78,6 +83,21 @@ class MyUser(AbstractBaseUser):
 		return True
 
 
+
+class Follow(models.Model):
+    following = models.ForeignKey('pages.Doctor',on_delete=models.CASCADE)
+    limit = models.Q(app_label = 'pages', model = 'Doctor') | models.Q(app_label = 'pages', model = 'Patient')
+    content_type = models.ForeignKey(ContentType, limit_choices_to = limit,on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    follower = GenericForeignKey('content_type', 'object_id')
+    date = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return str(self.follower) + ':' + str(self.following)
+
+
+
+
   
 class Patient(models.Model):
 	bloodgroup_choices = (('apos', 'A+'),
@@ -102,6 +122,8 @@ class Patient(models.Model):
 	bloodgroup = models.CharField(choices=bloodgroup_choices, max_length=12, default='-', blank=True)
 	place=models.CharField(max_length=50,blank=True)
 	imagefile=models.ImageField(upload_to='patient/',default="default.jpg",blank=True,null=True)
+	follower = GenericRelation(Follow,related_query_name='patient')
+ 
 
 
 	def __str__(self):
@@ -118,6 +140,8 @@ class Doctor(models.Model):
 	hos=models.CharField(max_length=150,blank=True)
 	imagefile=models.ImageField(upload_to='doctor/',default="default.jpg",blank=True,null=True)
 	location = PlacesField()
+	follower = GenericRelation(Follow,related_query_name='doctor')
+	
 	
 
 	# city = models.CharField(max_length=255)
@@ -216,4 +240,12 @@ class Comments(models.Model):
 		return str(self.post) +':'+str(self.author)+':'+str(self.id)
 
 
-
+class Messages(models.Model):
+    sender=models.ForeignKey(MyUser,on_delete=models.CASCADE,related_name='sender')
+    reciever=models.ForeignKey(MyUser,on_delete=models.CASCADE,related_name='reciever')
+    subject = models.CharField(max_length=50,blank=True)
+    content = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return str(self.sender) + ':' + str(self.reciever)+':'+str(self.date)

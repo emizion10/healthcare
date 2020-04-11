@@ -141,6 +141,65 @@
   }
 
 
+/* Popup message form */
+#loginPopup {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+      .form-popup {
+      border: 2px solid #666;
+      z-index: 9;
+      max-width: 300px;
+      margin: 0 auto;
+      }
+      .form-container {
+      max-width: 300px;
+      padding: 20px;
+      background-color: #fff;
+      }
+      /* Full-width for input fields */
+      .form-container input[type=text], .form-container textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 22px 0;
+      border: none;
+      background: #eee;
+      }
+      /* When the inputs get focus, do something */
+      .form-container input[type=text]:focus, .form-container textarea:focus {
+      background-color: #ddd;
+      outline: none;
+      }
+      /* Style submit/login button */
+      .form-container .btn {
+      background-color: #8ebf42;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom:10px;
+      opacity: 0.8;
+      }
+      /* Style cancel button */
+      .form-container .cancel {
+      background-color: #cc0000;
+      }
+      /* Hover effects for buttons */
+      .form-container .btn:hover, .open-button:hover {
+      opacity: 1;
+      }
+
+
 </style>
 {% endblock %}
 
@@ -156,9 +215,58 @@
 {% if user.user_type == 1 %}
 
 <a href="{% url 'doctorreview' %}">Add a Review</a>
+
+
 {% elif user.user_type == 2 %}
 
 {% endif %}
+
+
+{% if follow == 'True' %}
+
+<a href="{% url 'unfollowdoctor' pk=doctor.id %}">Unfollow</a>
+
+<button class="open-button" onclick="openForm()">
+  <strong>Message</strong>
+  </button>
+
+{% elif follow == 'False' %}
+
+<a href="{% url 'followdoctor' pk=doctor.id %}">Follow</a>
+
+<button class="open-button" onclick="openForm()">
+  <strong>Message</strong>
+  </button>
+
+{% endif %}
+
+
+
+
+<div id="loginPopup">
+  <div class="form-popup" id="popupForm">
+    <form action="{% url 'sendmessage'  %}" class="form-container">
+      {%  csrf_token %}
+      <h2>Message</h2>
+      <label for="email">
+      <strong>Subject</strong>
+      </label>
+      <input type="text" id="email" placeholder="Subject" name="subject" required>
+      <label for="psw">
+      <strong>Content</strong>
+      </label>
+      <textarea id="psw" placeholder="Content" name="content" required></textarea>
+      <input type="hidden" value="{{doctor.username}}" name="reciever">
+      <button type="submit" class="btn">Send</button>
+      <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
+    </form>
+  </div>
+</div>
+
+
+
+
+
 
 <div class="rela-block profile-card">
     <div class="profile-pic" id="profile_pic">
@@ -176,5 +284,26 @@
     </div>
 
 </div>
+
+{% endblock %}
+
+{% block endscript %}
+
+<script>
+function openForm() {
+  document.getElementById("loginPopup").style.display="block";
+}
+
+function closeForm() {
+  document.getElementById("loginPopup").style.display= "none";
+}
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  var modal = document.getElementById('loginPopup');
+  if (event.target == modal) {
+    closeForm();
+  }
+}
+</script>
 
 {% endblock %}

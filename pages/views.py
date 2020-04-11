@@ -1,6 +1,6 @@
 from . models import *
 from . forms import *
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render_to_response, redirect, render, get_object_or_404
@@ -8,14 +8,29 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import PermissionDenied
 from . decorators import *
-
+from django.urls import reverse
 from django.db.models import Q
 
 
 @login_required(login_url='login')
 def home(request):
-    pt = Post.objects.filter()
-    return render(request, 'pages/home.html',{'posts':pt})
+
+    if request.user.user_type == 1:
+        pt = get_object_or_404(Patient, username=request.user)
+        follow = Follow.objects.filter(
+            patient__username=request.user).values_list('following', flat=True)
+        post = Post.objects.filter(author__in=follow)
+
+    elif request.user.user_type == 2:
+        pt = get_object_or_404(Doctor, username=request.user)
+        follow = Follow.objects.filter(
+            doctor__username=request.user).values_list('following', flat=True)
+        post = Post.objects.filter(author__in=follow)
+
+    else:
+        post = Post.objects.filter()
+
+    return render(request, 'pages/home.html', {'posts': post})
 
 
 def index(request):
@@ -60,7 +75,6 @@ def login_view(request):
 
     context['login_form'] = form
 
-    # print(form)
     return render(request, "registration/login.html", {'form': form})
 
 
@@ -114,7 +128,6 @@ class AddDoctor(MyPermissionMixin, CreateView):
         doc = form.save(commit=False)
         username = form.cleaned_data['us']
 
-        
         imagefile = self.request.FILES['imagefile'] if 'imagefile' in self.request.FILES else False
         if imagefile == False:
             imagefile = 'default.jpg'
@@ -123,12 +136,11 @@ class AddDoctor(MyPermissionMixin, CreateView):
         usr = MyUser.objects.create()
         usr.username = username
         usr.set_password(password)
-        usr.user_type=2
+        usr.user_type = 2
         usr.save()
-        doc.username=usr
+        doc.username = usr
         doc.save()
 
-       
         return super(AddDoctor, self).form_valid(form)
 
 
@@ -184,15 +196,14 @@ class MC(MyPermissionMixin, DetailView):
     raise_exception = True
     login_url = "/login/"
     context_object_name = 'patient'
-    
+
     def get_object(self):
-        return get_object_or_404(Patient, username=self.request.user)    
+        return get_object_or_404(Patient, username=self.request.user)
 
     template_name = 'pages/mc.html'
 
     def test_func(self):
         return (self.request.user.user_type == 1)
-
 
 
 
@@ -278,10 +289,145 @@ class ViewDoctor(MyPermissionMixin, DetailView):
         self.request.session['doctor'] = self.kwargs['slug']
         return get_object_or_404(Doctor, dname=self.kwargs['slug'])
 
+    def get_context_data(self, **kwargs):
+        context = super(ViewDoctor, self).get_context_data(**kwargs)
+        if self.request.user.user_type == 1:
+            pt = get_object_or_404(Patient, username=self.request.user)
+        elif self.request.user.user_type == 2:
+            pt = get_object_or_404(Doctor, username=self.request.user)
+
+        doc = get_object_or_404(Doctor, dname=self.kwargs['slug'])
+        followers = pt.follower.filter(following=doc)
+        if followers:
+            context['follow'] = 'True'
+        else:
+            context['follow'] = 'False'
+
+        return context
+
     template_name = 'pages/doctorprofile.html'
 
     def test_func(self):
-        return (self.request.user.user_type == 1)
+        return (self.request.user.user_type == 1 or self.request.user.user_type == 2)
+
+
+class DoctorList(MyPermissionMixin, ListView):
+    raise_exception = True
+    login_url = "/login/"
+    context_object_name = 'doctor'
+
+    def get_queryset(self):
+        if self.request.user.user_type == 1:
+            pt = get_object_or_404(Patient, username=self.request.user)
+            follow = Follow.objects.filter(
+                patient__username=self.request.user).values_list('following', flat=True)
+
+        elif self.request.user.user_type == 2:
+            pt = get_object_or_404(Doctor, username=self.request.user)
+            follow = Follow.objects.filter(
+                doctor__username=self.request.user).values_list('following', flat=True)
+
+        return Doctor.objects.filter(id__in=follow)
+
+    def get_context_data(self, **kwargs):
+        context = super(DoctorList, self).get_context_data(**kwargs)
+        if self.request.user.user_type == 1:
+            pt = get_object_or_404(Patient, username=self.request.user)
+            follow = Follow.objects.filter(
+                patient__username=self.request.user).values_list('following', flat=True)
+
+        elif self.request.user.user_type == 2:
+            pt = get_object_or_404(Doctor, username=self.request.user)
+            follow = Follow.objects.filter(
+                doctor__username=self.request.user).values_list('following', flat=True)
+
+        context['unfollow'] = Doctor.objects.filter().exclude(
+            id__in=follow).exclude(username=self.request.user)
+
+        return context
+
+    template_name = 'pages/doctorlist.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 1 or self.request.user.user_type == 2)
+
+
+@login_required(login_url='login')
+def sendmessage(request):
+    reciever = request.GET.get('reciever')
+    subject = request.GET.get('subject')
+    content = request.GET.get('content')
+    typemsg = request.GET.get('type')
+    
+    rec = get_object_or_404(MyUser, username=reciever)
+    Messages.objects.create(sender=request.user,
+                            reciever=rec, subject=subject, content=content)
+    doc = get_object_or_404(Doctor, username=rec)
+
+    if typemsg=='reply':
+        return HttpResponseRedirect(reverse('viewmessage'))
+    else:    
+        return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
+
+@login_required(login_url='login')
+def deletemessage(request,**kwargs):
+    msg = get_object_or_404(Messages,id=kwargs['pk'])
+    if (msg.sender == request.user or msg.reciever==request.user):
+        msg.delete()
+    return HttpResponseRedirect(reverse('viewmessage'))
+
+
+
+
+class ViewMessage(MyPermissionMixin, ListView):
+    raise_exception = True
+    login_url = "/login/"
+    context_object_name = 'message'
+
+    def get_queryset(self):
+
+        return Messages.objects.filter(reciever=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super(ViewMessage, self).get_context_data(**kwargs)
+        
+        context['send_message'] = Messages.objects.filter(sender=self.request.user) 
+        return context
+
+    template_name = 'pages/messages.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 1 or self.request.user.user_type == 2)
+
+
+
+
+@login_required(login_url='login')
+def followdoctor(request, **kwargs):
+
+    if request.user.user_type == 1:
+        pt = get_object_or_404(Patient, username=request.user)
+    elif request.user.user_type == 2:
+        pt = get_object_or_404(Doctor, username=request.user)
+
+    doc = get_object_or_404(Doctor, id=kwargs['pk'])
+    Follow.objects.create(following=doc, follower=pt)
+    return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
+
+@login_required(login_url='login')
+def unfollowdoctor(request, **kwargs):
+    doc = get_object_or_404(Doctor, id=kwargs['pk'])
+    if request.user.user_type == 1:
+        pt = get_object_or_404(Patient, username=request.user)
+        follow = Follow.objects.get(
+            following=doc, patient__username=request.user)
+    elif request.user.user_type == 2:
+        pt = get_object_or_404(Doctor, username=request.user)
+        follow = Follow.objects.get(
+            following=doc, doctor__username=request.user)
+
+    follow.delete()
+    return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
 
 
 @user_is_patient
@@ -337,76 +483,78 @@ def addpost(request):
     return render(request, 'pages/addpost.html', {'form': form})
 
 
-
 class PostDetail(MyPermissionMixin, DetailView):
     raise_exception = True
     login_url = "/login/"
     context_object_name = 'post'
     model = Post
 
-
-
     def get_context_data(self, **kwargs):
         context = super(PostDetail, self).get_context_data(**kwargs)
-        post = get_object_or_404(Post,id=self.kwargs['pk'])
-        pre = Preference.objects.filter(user=self.request.user).filter(post=self.kwargs['pk'])
+        post = get_object_or_404(Post, id=self.kwargs['pk'])
+        pre = Preference.objects.filter(
+            user=self.request.user).filter(post=self.kwargs['pk'])
         if pre:
-        	context['preference'] = get_object_or_404(Preference,post=post,user=self.request.user)
-        
-        context['comments'] = Comments.objects.filter(post=post)   
+            context['preference'] = get_object_or_404(
+                Preference, post=post, user=self.request.user)
+
+        context['comments'] = Comments.objects.filter(post=post)
         return context
 
     template_name = 'pages/postdetail.html'
 
     def test_func(self):
-        return (self.request.user.user_type == 1 or self.request.user.user_type==2)
+        return (self.request.user.user_type == 1 or self.request.user.user_type == 2)
+
 
 @login_required(login_url='login')
-def postpreference(request,**kwargs):
-    post = get_object_or_404(Post,id=kwargs['pk'])
-    
-    pre = Preference.objects.filter(user=request.user).filter(post=kwargs['pk'])
+def postpreference(request, **kwargs):
+    post = get_object_or_404(Post, id=kwargs['pk'])
+
+    pre = Preference.objects.filter(
+        user=request.user).filter(post=kwargs['pk'])
     if pre:
-        pref = get_object_or_404(Preference,user=request.user,post=post)
-        if kwargs['value']==1:
+        pref = get_object_or_404(Preference, user=request.user, post=post)
+        if kwargs['value'] == 1:
             post.likes = post.likes + 1
             post.dislikes = post.dislikes - 1
         else:
             post.dislikes = post.dislikes + 1
             post.likes = post.likes - 1
-        
+
         pref.value = kwargs['value']
         pref.save()
     else:
-        if kwargs['value']==1:
+        if kwargs['value'] == 1:
             post.likes = post.likes + 1
         else:
             post.dislikes = post.dislikes + 1
-            
-        Preference.objects.create(user=request.user,post=post,value=kwargs['value'])
-    
-    pref = get_object_or_404(Preference,user=request.user,post=post)
+
+        Preference.objects.create(
+            user=request.user, post=post, value=kwargs['value'])
+
+    pref = get_object_or_404(Preference, user=request.user, post=post)
     post.save()
     comments = Comments.objects.filter(post=post)
-    return render(request,'pages/postdetail.html',{'post':post,'preference':pref,'comments':comments})
+    return render(request, 'pages/postdetail.html', {'post': post, 'preference': pref, 'comments': comments})
 
 
 @login_required(login_url='login')
-def addcomment(request,**kwargs):
+def addcomment(request, **kwargs):
     if request.method == 'POST':
         comment = request.POST.get('comment')
-        post = get_object_or_404(Post,id=kwargs['pk'])
-        Comments.objects.create(comment=comment,post=post,author=request.user)
-        
-        pre = Preference.objects.filter(user=request.user).filter(post=kwargs['pk'])
+        post = get_object_or_404(Post, id=kwargs['pk'])
+        Comments.objects.create(
+            comment=comment, post=post, author=request.user)
+
+        pre = Preference.objects.filter(
+            user=request.user).filter(post=kwargs['pk'])
         if pre:
-        	pref = get_object_or_404(Preference,user=request.user,post=post)
+            pref = get_object_or_404(Preference, user=request.user, post=post)
         else:
-            pref={}
+            pref = {}
         comments = Comments.objects.filter(post=post)
-        return render(request,'pages/postdetail.html',{'post':post,'preference':pref,'comments':comments})
-        
-        
+        return render(request, 'pages/postdetail.html', {'post': post, 'preference': pref, 'comments': comments})
 
 
 def logout_view(request):

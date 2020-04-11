@@ -40,21 +40,47 @@
                             <div class="row">
 
                                 <div class='imgdiv' class='side' align='left'
-                                    style='background-color: rgb(235, 235, 224);
-                                    border-radius:2px; border: 2px solid #000; width: 120px; height: 120px;'>
+                                    style='margin-top: 30px;   background-color: rgb(235, 235, 224);
+                                    border-radius:2px;  width: 120px; height: 120px;'>
                                     <img src='{{patient.imagefile.url}} ' height='120' width='120' />
                                     </div>
 
 
-                                <div class='main'> <label> Full Name &nbsp &nbsp
+                                <div class='main'> 
+                                    
+                                    <label> Full Name &nbsp &nbsp
                                 &nbsp &nbsp : {{patient.pname}}</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label> DOB : {{patient.dob}} </label>
 
-                                    <label> Date of Birth : {{patient.dob}} </label>
-                                    <label> Blood Group : {{patient.get_bloodgroup_display}} </label>
-                                    <br>
-                                    <div style="float: right;">
-                                    {% qr_from_text patient.regid size="4" image_format="png" error_correction="L" %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label> Blood Group : {{patient.get_bloodgroup_display}} </label>
+
+                                    </div>
+
                                 </div>
+                                
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label> Address : Keezhilam(H) </label>
+                                            <label> &emsp;&emsp;&emsp;&emsp;&ensp;  Choondy P.O </label>
+                                            <label> &emsp;&emsp;&emsp;&emsp;&ensp;  Pin : 682308 </label>
+                                            <label> Gender : {{patient.get_gender_display}} </label>
+
+
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div style="float: right;">
+                                                {% qr_from_text patient.regid size="4" image_format="png" error_correction="L" %}
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                   
 
                                 </div>
                             </div>
