@@ -64,29 +64,34 @@ class PatientForm(forms.ModelForm):
 
 class DoctorForm(forms.ModelForm):
 
-    spec_choices = (('Allergy and Immunology', 'Allergy and Immunology'),
-                    ('Anesthesiology', 'Anesthesiology'),
-                    ('Dermatology', 'Dermatology'),
-                    ('Diagnostic Radiology', 'Diagnostic Radiology'),
-                    ('Emergency Medicine', 'Emergency Medicine'),
-                    ('Family Medicine ', 'Family Medicine '),
-                    ('Medical Genetics', 'MedicalGenetics'),
-                    ('Neurology', 'Neurology'),
-                    ('Nuclear Medicine', 'Nuclear Medicine'),
-                    ('Obstetris and Gynecology', 'Obstetris and Gynecology'),
-                    ('Ophthalmology', 'Ophthalmology'),
-                    ('Pathology', 'Pathology'),
-                    ('Pediatrics', 'Pediatrics'),
-                    ('Pathology', 'Pathology'),
-                    ('Physical Medicine and Rehabilitation',
-                     'Physical Medicine and Rehabilitation'),
-                    ('Preventative Medicine', 'Preventative Medicine'),
-                    ('Psychiatry', 'Psychiatry'),
-                    ('Radiation Oncology', 'Radiation Oncology'),
-                    ('Surgery', 'Surgery'),
-                    ('Urology', 'Urology'),
-
-                    )
+    spec_choices = (("Hypertensiology", "Hypertensiology"),
+                    ("Surgery", "Surgery"),
+                    ("Gastroenterology", "Gastroenterology"),
+                    ("Traumatology", "Traumatology"),
+                    ("Ophthalmology", "Ophthalmology"),
+                    ("Toxicology", "Toxicology"),
+                    ("Orthopedics", "Orthopedics"),
+                    ("Dermatology", "Dermatology"),
+                    ("Infectiology", "Infectiology"),
+                    ("Endocrinology", "Endocrinology"),
+                    ("Pulmonology", "Pulmonology"),
+                    ("Urology", "Urology"),
+                    ("Cardiology", "Cardiology"),
+                    ("Nephrology", "Nephrology"),
+                    ("Hematology", "Hematology"),
+                    ("Laryngology/ENT", "Laryngology/ENT"),
+                    ("Gynecology", "Gynecology"),
+                    ("Psychiatry", "Psychiatry"),
+                    ("Oncology", "Oncology"),
+                    ("Allergology", "Allergology"),
+                    ("Neurology", "Neurology"),
+                    ("Rheumatology", "Rheumatology"),
+                    ("Venereology", "Venereology"),
+                    ("Angiology", "Angiology"),
+                    ("Internal Medicine", "Internal Medicine"),
+                    ("Other", "Other"),
+                    ("Dentistry", "Dentistry"),
+                    ("Diabetology", "Diabetology"))
 
     us = forms.CharField(max_length=60, label='Username')
     password = forms.CharField(widget=forms.PasswordInput, label='Password')
@@ -101,10 +106,11 @@ class DoctorForm(forms.ModelForm):
     hos = forms.CharField(max_length=150, required=False,
                           label='Hospital Name')
     imagefile = forms.ImageField(required=False, label='Upload Image')
+
     class Meta():
         model = Doctor
         fields = ('us', 'password', 'regid', 'dname',
-                  'dob', 'gender', 'spec', 'hos', 'imagefile','location')
+                  'dob', 'gender', 'spec', 'hos', 'imagefile', 'location')
 
     def clean_regid(self):
         if Doctor.objects.filter(regid__iexact=self.cleaned_data['regid']):
@@ -119,17 +125,16 @@ class MedicalRecordForm(forms.ModelForm):
         fields = ('condition', 'prescription',
                   'procedures', 'description', 'diagnosis')
 
+
 class ReviewForm(forms.ModelForm):
-    
+
     class Meta():
         model = Review
-        fields = ('rating','description')
-        
+        fields = ('rating', 'description')
+
 
 class PostForm(forms.ModelForm):
-    
+
     class Meta():
         model = Post
-        fields = ('title','content','image')
-        
-        
+        fields = ('title', 'content', 'image')

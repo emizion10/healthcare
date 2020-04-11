@@ -28,6 +28,37 @@ ACCESS_CHOICES = (
 	('custom','custom'),
 )
 
+
+spec_choices = (("Hypertensiology","Hypertensiology"),
+	("Surgery","Surgery"),
+	("Gastroenterology","Gastroenterology"),
+	("Traumatology","Traumatology"),
+	("Ophthalmology","Ophthalmology"),
+	("Toxicology","Toxicology"),
+	("Orthopedics","Orthopedics"),
+	("Dermatology","Dermatology"),
+	("Infectiology","Infectiology"),
+	("Endocrinology","Endocrinology"),
+	("Pulmonology","Pulmonology"),
+	("Urology","Urology"),
+	("Cardiology","Cardiology"),
+	("Nephrology","Nephrology"),
+	("Hematology","Hematology"),
+	("Laryngology/ENT","Laryngology/ENT"),
+	("Gynecology","Gynecology"),
+	("Psychiatry","Psychiatry"),
+	("Oncology","Oncology"),
+	("Allergology","Allergology"),
+	("Neurology","Neurology"),
+	("Rheumatology","Rheumatology"),
+	("Venereology","Venereology"),
+	("Angiology","Angiology"),
+	("Internal Medicine","Internal Medicine"),
+	("Other","Other"),
+	("Dentistry","Dentistry"),
+	("Diabetology","Diabetology"))
+
+
 class MyAccountManager(BaseUserManager):
 	def create_user(self, username, password=None):
 		if not username:
@@ -69,7 +100,6 @@ class MyUser(AbstractBaseUser):
 	user_type= models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=4)
 
 	USERNAME_FIELD = 'username'
-	# REQUIRED_FIELDS = ['username']
 
 	objects = MyAccountManager()
 
@@ -144,10 +174,6 @@ class Doctor(models.Model):
 	
 	
 
-	# city = models.CharField(max_length=255)
-	# location = LocationField(based_fields=['city'], zoom=7, default=Point(1.0, 1.0))
-	# loc=LocationField()
-
 
 	def __str__(self):
 		return self.dname
@@ -197,6 +223,7 @@ class Review(models.Model):
     description = models.TextField(blank=True)
     author = models.ForeignKey(Patient, verbose_name="patient",on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, verbose_name="doctor",on_delete=models.CASCADE)
+    spec=models.CharField(choices=spec_choices,max_length=50,default='Other')
     
     def __str__(self):
         return u'%s  %s' % (self.doctor, self.id)

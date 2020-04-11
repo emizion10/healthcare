@@ -1,0 +1,489 @@
+{% extends 'pages/base.html' %}
+
+{% block title %}Doctor Recommendation{% endblock %}
+{% block script %}
+
+
+<style type="text/css">
+	@import url('https://fonts.googleapis.com/css2?family=Lora&family=Yeseva+One&display=swap');
+
+	* {
+ --hibiscus-love: #fc465c;
+  --fine-ii: #f9b198;
+  --afl: #fac8af;
+  --mexican-sky: #cfdddd;
+  --brasillia-peach: #facb85;
+  --free: #33032d;
+  --captured: #2b2120;
+
+  --primary-color: var(--brasillia-peach);
+  --secondary-color: var(--hibiscus-love);
+  --tertiary-color: var(--fine-ii);
+  --quadrary-color: var(--afl);
+  --bg-color: var(--mexican-sky);
+  --text-color: var(--free);
+  --header-color: var(--captured);
+  --error-color: var(--hibiscus-love);
+  --success-color: #73d12e;
+
+  box-sizing: border-box;
+}
+label {
+	color: var(--captured);
+
+display:inline-block;
+width:200px;
+margin-right:30px;
+text-align:right;
+
+}
+button{
+	background-color: Transparent;
+	color: gray;
+	/*background-repeat:no-repeat;*/
+    border: none;
+    cursor:pointer;
+    overflow: hidden;
+    outline:none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Yeseva One', Georgia, cursive;
+  color: var(--header-color);
+  text-align: center;
+}
+.container2 {
+  width: 800px;
+  border-radius: 0.6em;
+  padding: 20px;
+  background-color: var(--primary-color);
+  box-shadow: 20px 20px 60px #97a1a1, -20px -20px 60px #ffffff;
+  margin: 20px auto;
+}
+
+
+.wrapper {
+  margin: 8px 0;
+}
+
+.state {
+  position: relative;
+  top: 0;
+  right: 0;
+  opacity: 1e-5;
+  pointer-events: none;
+}
+
+.label {
+  display: inline;
+  /*align-items: center;*/
+  cursor: pointer;
+  color: var(--captured);
+  padding: 2px 4px;
+}
+
+.text {
+  margin-left: 26px;
+  opacity: .6;
+  transition: opacity .2s linear, transform .2s ease-out;
+  position: relative;
+}
+
+.indicator {
+	position: absolute;
+  display: inline;
+  /*border-radius: 50%;*/
+  height: 20px;
+  width: 20px;
+  margin-left: 0px;
+  /*box-shadow:
+    -8px -4px 8px 0px #ffffff,
+    8px 4px 12px 0px #d1d9e6;*/
+  /*overflow: hidden;*/
+}
+
+.indicator::before,
+.indicator::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  height: 80%;
+  width: 80%;
+  border-radius: 50%;
+}
+
+.indicator::before {
+  box-shadow:
+    -4px -2px 4px 0px black,
+    4px 2px 8px 0px brown;
+}
+
+.indicator::after {
+  background-color: #ecf0f3;
+  box-shadow:
+    -4px -2px 4px 0px #fff,
+    4px 2px 8px 0px #d1d9e6;
+  /*transform: scale3d(1, 1, 1);
+  transition: opacity .25s ease-in-out, transform .25s ease-in-out;*/
+}
+
+.state:checked ~ .label .indicator::after {
+  /*transform: scale3d(.975, .975, 1) translate3d(0, 10%, 0);*/
+  opacity: 0;
+}
+
+.state:focus ~ .label .text {
+  transform: translate3d(8px, 0, 0);
+  opacity: 1;
+}
+
+.label:hover .text {
+  opacity: 1;
+}
+	#map {
+		height: 40%;
+		width:40%;
+
+	}
+	
+	#my-address {
+		background-color: #fff;
+		font-family: Roboto;
+		font-size: 16px;
+		font-weight: 300;
+		padding: 0 11px 0 13px;
+		text-overflow: ellipsis;
+		width: 300px;
+		height: :100px;
+	}
+
+	#btnclass{
+		cursor: pointer;
+  background: var(--secondary-color);
+  box-shadow: 4px 4px 8px #c19c66, -4px -4px 8px #fffaa4;
+  border: 1px solid #ec263c66;
+  color: #fff;
+  font-size: 16px;
+  padding: 0.618em 1.2em;
+  border-radius: 0.4em;
+  font-family: 'Yeseva One', Georgia, cursive;
+  display: block;
+  margin-top: 1.2em;
+  margin-left: 35%;
+  width: 30%;
+
+}
+
+
+	
+
+	
+	</style>
+
+	{% endblock %}
+
+	{% block content %}
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKzjwtu-tyyJQtPP3rFPxPRCgtZHgmKfs&callback=initMap&v=3.exp&sensor=false&libraries=places"></script>
+
+	<div class="container2">
+		<br>
+		<h3>Find doctors near you..</h3>
+	<br>
+	<label class="labeltext"> Specialization: </label>
+	<select id="spec" >
+
+		<option value="None">--Select--</option>
+	</select>
+	<br>
+	<br>
+
+	<label>Medical Conditions:</label>
+
+
+	<select id="symptoms"> 
+
+	</select>
+	
+	<button onclick="add()">+</button> 
+	<br>
+	<br>
+	
+
+    <label>Chosen Symptoms:</label>
+    
+    <textarea id="sym" rows="2" cols="30">
+	</textarea> 
+	
+	<button onclick="clr()">Clear</button>
+
+
+	<br>
+	<label>Location: </label>
+	<input type="text" id="my-address" placeholder="Enter preferred location "> 
+
+
+&nbsp;
+	<button id="getCords" onClick="codeAddress();">Save Location</button>
+
+	<br><br>
+
+    <button onclick="sub()" id="btnclass" >SUBMIT</button></p>
+    
+    <br><br>
+<div id="sorbyoption">
+	<label> Sort By : </label>
+	<span class="radiogroup" >
+  <span class="wrapper" >
+    <input class="state" type="radio" name="app" id="a" value="a">
+    <label class="label" for="a">
+      <span class="indicator"></span>
+      <span class="text">Relevance</span>
+    </label>
+  </span> &nbsp;
+  <span class="wrapper">
+    <input class="state" type="radio" name="app" id="b" value="b">
+    <label class="label" for="b">
+      <span class="indicator"></span>
+      <span class="text">Ratings and Reviews</span>
+    </label>
+  </span>&nbsp;
+  <span class="wrapper">
+    <input class="state" type="radio" name="app" id="c" value="c">
+    <label class="label" for="c">
+      <span class="indicator"></span>
+      <span class="text">Distance</span>
+    </label>
+  </span>
+</span>
+</div>
+	
+
+	<table id="result" cellpadding="10"cellspacing="20" align="center">
+
+
+	</table>
+
+	<p id="val"></p>
+
+</div>
+	<script >
+		var ff=0;
+		var latitude,longitude;
+		var sympt=[];
+		var obj=[];
+		var rank={'mild':1,'moderate':2,'severe':3};
+		var severity=[];
+		var category=[];
+		var speclist=[];
+		var domain=[];
+		$("#sorbyoption").hide();
+
+
+		function sub(){
+
+			var sortby = 'a';
+			category=[];
+			speclist=[];
+			severity=[];
+
+
+			var spec=$('#spec').find(":selected").text();
+			var index=[];
+
+			if(ff==0)
+				window.alert("No saved location found..please input your location");
+
+			if (spec=="--Select--")
+			{
+				for(var j in sympt){
+					severity.push(obj[sympt[j]].severity);
+					category.push(obj[sympt[j]].categories);
+
+
+				}
+
+
+				var l=rank[severity[0]];
+				var r=severity[0];
+				for(var k in severity){
+					if (rank[severity[k]] >l){
+						l=rank[severity[k]];
+						r=severity[k];
+					}
+
+				}
+
+				for(var k in severity){
+					if (severity[k]==r)
+						index.push(k);
+				}
+
+				for(var k in index)
+					speclist.push(category[index[k]]);
+
+			}	
+			else{
+				sympt=[];
+				category=[];
+				speclist=[];
+				severity=[];
+				speclist.push($('#spec').find(":selected").text());
+
+
+			}
+
+			var speclistToString = JSON.stringify(speclist); 
+				// var speclistToJsonObject = JSON.parse(speclistToString);
+
+
+				$.get('/home/predictdoctor/',{'latitude':latitude.toString(),'longitude':longitude.toString(),'spec':speclistToString, 'sortby':sortby}, function(data){
+					$("#sorbyoption").show();
+					$("#result").html(data);
+
+
+
+					
+				});
+
+			$("input:radio[name=app]").click(function() {
+				var sortby = $('input[type=radio][name=app]:checked').attr('id');
+				$.get('/home/predictdoctor/',{'latitude':latitude.toString(),'longitude':longitude.toString(),'spec':speclistToString, 'sortby':sortby}, function(data){
+					$("#result").html(data)
+					
+				});
+
+			});
+
+			}
+
+			function add(){
+				var valselected = document.getElementById("symptoms").value;
+				var symclicked = $("#symptoms option:selected").text();
+				var symselected = document.getElementById("sym").value;
+				var arr = symselected.split("\n");
+
+				var i = 0;
+				var flag = -1;
+				while (i < arr.length) {
+					if (arr[i] == symclicked) {
+						flag = 1;
+						break;
+					}
+					i = i + 1;
+				}
+				if (flag == -1) {
+					if (symselected.length > 0){
+						document.getElementById("sym").value = arr.join("\n")+"\n" + symclicked;
+						sympt.push(valselected);
+					}
+
+
+					else{
+						document.getElementById("sym").value = symclicked;
+						sympt.push(valselected);
+					}
+
+				}
+
+
+			}
+
+
+			function clr(){
+				document.getElementById("sym").value = '';
+				sympt =[];
+				severity=[];
+				category=[];
+				speclist=[];
+
+			}
+
+			$.ajax({
+				type: 'GET',
+				url: 'https://api.infermedica.com/v2/conditions',
+				headers: {
+					"App-Id":'0356a9a9',
+					"App-Key" :'116ba23bb4e06e901cdf29af1e8ee809',
+					"Content-Type":'application/json'
+
+				},
+				dataType: "JSON",
+				success: function (data) {
+					obj=data;
+					line="";
+					line+=" <option disabled selected value> -- select an option -- </option>";
+					cat="";
+					for(var i in data){
+
+						line += "<option value='"+i+"'>"+data[i].name+"</option>";
+						for (var val in data[i].categories){
+							if(domain.indexOf(data[i].categories[val])==-1){
+								domain.push(data[i].categories[val])
+								cat += "<option value='"+data[i].categories[val]+"'>"+data[i].categories[val]+"</option>";
+
+							}
+						}
+
+					}
+
+					$("#spec").append(cat);
+					$("#symptoms").append(line);
+					$("select").select2();
+
+				},
+				error: function(error) {
+					console.log('Error: ' + error);
+				}
+
+			});
+
+			
+    function initialize() {
+    	var address = (document.getElementById('my-address'));
+    	var autocomplete = new google.maps.places.Autocomplete(address);
+    	autocomplete.setTypes(['geocode']);
+    	google.maps.event.addListener(autocomplete, 'place_changed', function () {
+    		var place = autocomplete.getPlace();
+    		if (!place.geometry) {
+    			return;
+    		}
+
+    		var address = '';
+    		if (place.address_components) {
+    			address = [
+    			(place.address_components[0] && place.address_components[0].short_name || ''),
+    			(place.address_components[1] && place.address_components[1].short_name || ''),
+    			(place.address_components[2] && place.address_components[2].short_name || '')
+    			].join(' ');
+    		}
+    	});
+    }
+    function codeAddress() {
+    	ff=1;
+    	geocoder = new google.maps.Geocoder();
+    	var address = document.getElementById("my-address").value;
+    	geocoder.geocode({ 'address': address }, function (results, status) {
+    		if (status == google.maps.GeocoderStatus.OK) {
+
+    			latitude=results[0].geometry.location.lat();
+    			longitude= results[0].geometry.location.lng();
+    		}
+
+    		else {
+    			alert("Enter a valid location..!!: " + status);
+    		}
+    	});
+    }
+    google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+{% endblock %}

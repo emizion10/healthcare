@@ -1,25 +1,100 @@
 {% extends 'pages/base.html' %}
 {% load crispy_forms_tags %}
 {% block title %}Doctors{% endblock %}
+{% block script %}
+<style>
+.card {position: relative; border-radius: 3px; background-color: #fff;color: #4f5256;border: 1px solid #f2f2f2;margin-bottom: 16px;background:#fff;}
+.card-header{ padding: 16px;margin:0px;}
+.card-body {position: relative; padding: 16px;}
+
+.gaadiex-list {list-style-type: none; margin: 0;padding: 0;}
+.gaadiex-list>.gaadiex-list-item {padding: 0 22px;}
+.gaadiex-list-item-img  {
+    float: left;
+    width: 58px;
+    height: 58px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+.gaadiex-list-item i  {
+    float: left;
+    font-size:48px;
+    width: 58px;
+    height: 58px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+.border-b-1 {border-bottom: 1px solid rgba(162,162,162,.16);}
+
+a:link {
+  text-decoration: none;
+}
+
+</style>
+
+
+{% endblock %}
 
 
 {% block content %}
 
-<h2>Following</h2>
-{% for doctor in doctor %}
 
-<a href="{% url 'viewdoctor' slug=doctor.dname %}">
-    <h2>{{doctor.dname}}</h2>
-</a>
-{% endfor %}
 
-<h2>Not Following</h2>
-{% for doc in unfollow %}
+<div class="row">
+		<div class="col-md-6">
+		    <div class="card">
+		        <div class="card-header">
+		            <h4>Following</h4>
+		        </div>
+		        <div class="gaadiex-list">
+                    {% for doctor in doctor %}
+                    <br>
+                    <div class="gaadiex-list-item border-b-1"><img class="gaadiex-list-item-img" src="{{doctor.imagefile.url}} " alt="List user">
+                      <div class="gaadiex-list-item-text">
+                        <h3><a href="{% url 'viewdoctor' slug=doctor.dname %}">{{doctor.dname}}</a></h3>
+                        <h4>{{doctor.spec}}</h4>
+                        <p> <button class="btn btn-primary"><a style="color: white;"  href="{% url 'unfollowdoctor' pk=doctor.id %}">Unfollow</a>
+                        </button>
+                        </p>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  
+                  </div>
+		    </div>
+        </div>
 
-<a href="{% url 'viewdoctor' slug=doc.dname %}">
-    <h2>{{doc.dname}}</h2>
-</a>
-{% endfor %}
+        <div class="col-md-6">
+		    <div class="card">
+		        <div class="card-header">
+		            <h4>Not Following</h4>
+		        </div>
+		        <div class="gaadiex-list">
+                    {% for doctor in unfollow %}
+<br>
+                    <div class="gaadiex-list-item border-b-1"><img class="gaadiex-list-item-img" src="{{doctor.imagefile.url}} " alt="List user">
+                      <div class="gaadiex-list-item-text">
+                        <h3><a href="{% url 'viewdoctor' slug=doctor.dname %}">{{doctor.dname}}</a></h3>
+                        <h4>{{doctor.spec}}</h4>
+                        <p><button class="btn btn-danger"> <a style="color: white;" href="{% url 'followdoctor' pk=doctor.id %}">Follow</a>
+                        </button>
+                        </p>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  
+                  </div>
+		    </div>
+        </div>
+
+    </div>
+
+
+
 
 
 

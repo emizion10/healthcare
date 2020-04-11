@@ -31,6 +31,8 @@ urlpatterns = [
     path('sendmessage/',views.sendmessage, name='sendmessage'),
     path('viewmessage/',ViewMessage.as_view(), name='viewmessage'),
     path('deletemessage/<int:pk>',views.deletemessage, name='deletemessage'),
+    path('doctorrecommend/',views.doctorrecommend, name='doctorrecommend'),
+    path('predictdoctor/',views.predictdoctor, name='predictdoctor'),
     
     
     

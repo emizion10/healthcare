@@ -200,7 +200,10 @@
       }
 
 
+      nav li {display:inline-block;}
+
 </style>
+
 {% endblock %}
 
 {% block content %}
@@ -213,8 +216,12 @@
     rel="stylesheet">
 
 {% if user.user_type == 1 %}
+&nbsp;
+<button style="float: right;margin-left: 1opx;" class="btn btn-success">
+  <a style="color: white;" href="{% url 'doctorreview' %}">Add a Review</a>
 
-<a href="{% url 'doctorreview' %}">Add a Review</a>
+
+</button>
 
 
 {% elif user.user_type == 2 %}
@@ -224,17 +231,23 @@
 
 {% if follow == 'True' %}
 
-<a href="{% url 'unfollowdoctor' pk=doctor.id %}">Unfollow</a>
+<button style="float: right;margin-right: 10px;" class="btn btn-danger">
 
-<button class="open-button" onclick="openForm()">
+<a style="color: white;" href="{% url 'unfollowdoctor' pk=doctor.id %}">Unfollow</a>
+</button>
+&nbsp;
+
+<button class="open-button btn btn-success" onclick="openForm()">
   <strong>Message</strong>
   </button>
 
 {% elif follow == 'False' %}
+<button style="float: right;margin-right: 10px;" class="btn btn-primary">
+<a style="color: white;" href="{% url 'followdoctor' pk=doctor.id %}">Follow</a>
+</button>
+&nbsp;
 
-<a href="{% url 'followdoctor' pk=doctor.id %}">Follow</a>
-
-<button class="open-button" onclick="openForm()">
+<button class="open-button btn btn-success" onclick="openForm()">
   <strong>Message</strong>
   </button>
 
@@ -282,6 +295,18 @@
 
 
     </div>
+    <nav class="navbar navbar-default horizontal" >
+      <div class="container-fluid" >
+        
+        <ul class="nav nav-navbar" >
+          <li class="active" >
+            <a href="#">Education</a></li>
+          <li><a href="#">Experience</a></li>
+          <li><a href="#">Reviews</a></li>
+        </ul>
+       
+      </div>
+    </nav>
 
 </div>
 

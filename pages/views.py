@@ -436,13 +436,16 @@ def addreview(request):
         form = ReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
-            review.doctor = get_object_or_404(
-                Doctor, dname=request.session['doctor'])
+            doc = get_object_or_404(Doctor, dname=request.session['doctor'])
+            
+            review.doctor = doc
+            review.spec = doc.spec
             review.author = get_object_or_404(
                 Patient, username=request.user)
             review.save()
-            doc = get_object_or_404(Doctor, dname=request.session['doctor'])
-            return render(request, 'pages/doctorprofile.html', {'doctor': doc, })
+            # return render(request, 'pages/doctorprofile.html', {'doctor': doc, })
+            return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
+            
     else:
         form = ReviewForm()
 
@@ -560,3 +563,97 @@ def addcomment(request, **kwargs):
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+
+# Doctor Reccommendation
+
+import csv
+from math import radians, sin, cos, acos
+# from django.http import HttpResponse
+from .models import Review
+import numpy as np
+import pandas as pd
+from djqscsv import write_csv
+from django.db.models import Model
+# from pages.models import Review,Doctor
+from textblob import TextBlob
+from geopy.distance import geodesic
+import json
+import re
+
+
+@user_is_patient
+def doctorrecommend(request):
+	return render(request,'pages/doctorrecommend.html')
+
+@user_is_patient   	
+def predictdoctor(request):
+	d=[]
+	qs = Review.objects.all()
+	with open('foo.csv', 'wb') as csv_file:
+		write_csv(qs, csv_file)
+	df = pd.read_csv('./foo.csv')
+	spec=request.GET.get('spec')
+	spec=spec.replace('[','') 
+	spec=spec.replace(']','')
+	spec=spec.replace('"','')
+	speclist=list(spec.split(","))
+	sortby=request.GET.get('sortby')
+
+	docs = pd.DataFrame.from_records(Doctor.objects.all().values('id', 'dname','spec','location'))
+	doc=pd.DataFrame(docs.loc[docs['spec'].isin(speclist)])
+	if(doc.shape[0] == 0):
+		return HttpResponse("<h5>No doctors found!!</h5>")
+	
+	doc['distance']=0.000000000000
+	latitude=radians(float(request.GET.get('latitude')))
+	longitude=radians(float(request.GET.get('longitude')))
+	j=0
+	df['desc_val']=df.apply(lambda x: TextBlob(x.description).sentiment.polarity,axis=1)
+	
+	for index, row in df.iterrows():
+		desc=row["description"]
+		summation=0
+		words=re.split('[, .  ]',desc)
+		for word in words:
+			summation+=TextBlob(word).sentiment.polarity
+		df.iat[j,6]=summation/len(words)
+		j=j+1
+	
+	i=0
+	for index, row in doc.iterrows():
+
+		lat=radians(float(row["location"].latitude))
+		lon=radians(float(row["location"].longitude))
+		dis=6371.01 * acos(sin(latitude)*sin(lat) + cos(latitude)*cos(lat)*cos(longitude - lon))
+		doc.iat[i,4]=dis
+		i=i+1
+	
+	combined_df=pd.merge(df,doc,left_on='doctor_id', right_on='id')
+
+	if sortby=='a':
+			combined_df['weighted_rating']=combined_df.apply(lambda x: x.rating*10 + x.desc_val *7.5 -x.distance,axis=1)
+	elif sortby=='b':
+		combined_df['weighted_rating']=combined_df.apply(lambda x: x.rating*10 + x.desc_val *7.5,axis=1)
+	else:
+		combined_df['weighted_rating']=combined_df.apply(lambda x: x.distance,axis=1)
+	print(combined_df)
+	result=pd.DataFrame(combined_df.groupby(['doctor_id'],as_index=False)['weighted_rating'].mean())
+	print(result)
+    
+	if sortby=='a' or sortby=='b':
+		final_df = result.sort_values(by=['weighted_rating'], ascending=False)
+	else:
+		final_df = result.sort_values(by=['weighted_rating'], ascending=True)
+	print(final_df)
+	predicted=final_df['doctor_id'].to_list()
+	print(predicted)
+	if len(predicted)==0:
+		return HttpResponse("<h5>No doctors found!!</h5>")
+	t=""
+	t=t+"<tr><th>Doctor Name</th><th>Specialization</th><th>Location</th></tr>"
+	for k in predicted[:]:
+		query=Doctor.objects.filter(id=k).values('id', 'dname','spec','location')[0]
+		t=t+"<tr><td>"+query['dname']+"</td><td>"+query['spec']+"&nbsp;&nbsp;</td><td>"+query['location'].place+"</td></tr>"
+	
+	return HttpResponse(t)
