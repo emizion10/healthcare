@@ -26,8 +26,8 @@ admin.site.register(Preference)
 admin.site.register(Comments)
 admin.site.register(Follow)
 admin.site.register(Messages)
-
-
+admin.site.register(Education)
+admin.site.register(Experience)
 
 
 

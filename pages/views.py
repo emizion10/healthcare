@@ -19,18 +19,24 @@ def home(request):
         pt = get_object_or_404(Patient, username=request.user)
         follow = Follow.objects.filter(
             patient__username=request.user).values_list('following', flat=True)
-        post = Post.objects.filter(author__in=follow)
+        post = Post.objects.filter(author__in=follow).order_by('-created_date')
 
     elif request.user.user_type == 2:
         pt = get_object_or_404(Doctor, username=request.user)
         follow = Follow.objects.filter(
             doctor__username=request.user).values_list('following', flat=True)
-        post = Post.objects.filter(author__in=follow)
+        post = Post.objects.filter(author__in=follow).order_by('-created_date')
 
     else:
-        post = Post.objects.filter()
+        post = Post.objects.filter().order_by('-created_date')
 
-    return render(request, 'pages/home.html', {'posts': post})
+    ct = Comments.objects.filter()
+    for p in post:
+        p.comment=Comments.objects.filter(post=p).order_by('-date')[:2]
+        p.count=Comments.objects.filter(post=p).count()
+        
+    
+    return render(request, 'pages/home.html', {'posts': post,'comment':ct})
 
 
 def index(request):
@@ -152,10 +158,53 @@ class DoctorProfile(MyPermissionMixin, DetailView):
     def get_object(self):
         return get_object_or_404(Doctor, username=self.request.user)
 
+
+    def get_context_data(self, **kwargs):
+        context = super(DoctorProfile, self).get_context_data(**kwargs)
+        doc = get_object_or_404(Doctor, username=self.request.user)
+        context['education'] = Education.objects.filter(user=doc)
+        context['experience'] = Experience.objects.filter(user=doc)
+        context['review'] = Review.objects.filter(doctor=doc)
+        
+        return context
+    
     template_name = 'pages/doctorprofile.html'
 
     def test_func(self):
         return (self.request.user.user_type == 2)
+
+
+@user_is_doctor
+def addeducation(request):
+    if request.method == 'POST':
+        degree = request.POST['degree']
+        inst = request.POST['institute']
+        ds = request.POST['date_start']
+        de = request.POST['date_end']
+        desc = request.POST['desc']
+        doc = get_object_or_404(Doctor, username=request.user)
+
+        Education.objects.create(user=doc,degree_name=degree,institute_name=inst,date_start=ds,date_end=de,description=desc)
+        
+        return HttpResponseRedirect(reverse('doctorprofile'))
+
+
+
+@user_is_doctor
+def addexperience(request):
+    if request.method == 'POST':
+        degree = request.POST['degree']
+        inst = request.POST['institute']
+        ds = request.POST['date_start']
+        de = request.POST['date_end']
+        desc = request.POST['desc']
+        doc = get_object_or_404(Doctor, username=request.user)
+
+        Experience.objects.create(user=doc,designation=degree,hospital_name=inst,date_start=ds,date_end=de,description=desc)
+        
+        return HttpResponseRedirect(reverse('doctorprofile'))
+
+    
 
 
 class PatientProfile(MyPermissionMixin, DetailView):
@@ -286,7 +335,7 @@ class ViewDoctor(MyPermissionMixin, DetailView):
     context_object_name = 'doctor'
 
     def get_object(self, *args, **kwargs):
-        self.request.session['doctor'] = self.kwargs['slug']
+        # self.request.session['doctor'] = self.kwargs['slug']
         return get_object_or_404(Doctor, dname=self.kwargs['slug'])
 
     def get_context_data(self, **kwargs):
@@ -302,6 +351,12 @@ class ViewDoctor(MyPermissionMixin, DetailView):
             context['follow'] = 'True'
         else:
             context['follow'] = 'False'
+            
+        context['education'] = Education.objects.filter(user=doc)
+        context['experience'] = Experience.objects.filter(user=doc)
+        context['review'] = Review.objects.filter(doctor=doc)
+        
+        
 
         return context
 
@@ -362,11 +417,12 @@ def sendmessage(request):
     rec = get_object_or_404(MyUser, username=reciever)
     Messages.objects.create(sender=request.user,
                             reciever=rec, subject=subject, content=content)
-    doc = get_object_or_404(Doctor, username=rec)
 
     if typemsg=='reply':
         return HttpResponseRedirect(reverse('viewmessage'))
     else:    
+        doc = get_object_or_404(Doctor, username=rec)
+        
         return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
 
 @login_required(login_url='login')
@@ -385,13 +441,34 @@ class ViewMessage(MyPermissionMixin, ListView):
     context_object_name = 'message'
 
     def get_queryset(self):
-
-        return Messages.objects.filter(reciever=self.request.user)
+        
+        msg = Messages.objects.filter(reciever=self.request.user)
+        for m in msg:
+            pt = Patient.objects.filter(username=m.sender)
+            if pt:
+                pt = get_object_or_404(Patient,username=m.sender)
+                m.author = pt.pname
+            else:
+                doc = get_object_or_404(Doctor,username=m.sender)
+                m.author= doc.dname
+        
+        
+        return msg
 
     def get_context_data(self, **kwargs):
         context = super(ViewMessage, self).get_context_data(**kwargs)
         
-        context['send_message'] = Messages.objects.filter(sender=self.request.user) 
+        msg = Messages.objects.filter(sender=self.request.user) 
+        for m in msg:
+            pt = Patient.objects.filter(username=m.reciever)
+            if pt:
+                pt = get_object_or_404(Patient,username=m.reciever)
+                m.author = pt.pname
+            else:
+                doc = get_object_or_404(Doctor,username=m.reciever)
+                m.author= doc.dname
+        
+        context['send_message'] = msg
         return context
 
     template_name = 'pages/messages.html'
@@ -432,24 +509,20 @@ def unfollowdoctor(request, **kwargs):
 
 @user_is_patient
 def addreview(request):
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            doc = get_object_or_404(Doctor, dname=request.session['doctor'])
-            
-            review.doctor = doc
-            review.spec = doc.spec
-            review.author = get_object_or_404(
-                Patient, username=request.user)
-            review.save()
-            # return render(request, 'pages/doctorprofile.html', {'doctor': doc, })
-            return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
-            
-    else:
-        form = ReviewForm()
-
-    return render(request, 'pages/doctorreview.html', {'form': form})
+    
+    if request.method == 'POST':    
+        doctor = request.POST['doctor']
+        rating = request.POST['rating']
+        description = request.POST['description']
+        
+        doc = get_object_or_404(Doctor, dname=doctor)
+        
+        spec = doc.spec
+        author = get_object_or_404(
+            Patient, username=request.user)
+        Review.objects.create(rating=rating,description=description,author=author,spec=spec,doctor=doc)
+        return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
+        
 
 
 class DoctorPosts(MyPermissionMixin, ListView):
@@ -501,7 +574,20 @@ class PostDetail(MyPermissionMixin, DetailView):
             context['preference'] = get_object_or_404(
                 Preference, post=post, user=self.request.user)
 
-        context['comments'] = Comments.objects.filter(post=post)
+        ct = Comments.objects.filter(post=post).order_by('-date')
+        for c in ct:
+            pat = Patient.objects.filter(username=c.author)
+            if pat:
+                pat = get_object_or_404(Patient,username = c.author)
+                c.name = pat.pname
+                c.image = pat.imagefile
+            else:
+                doc = get_object_or_404(Doctor,username=c.author)
+                c.name = doc.dname
+                c.image = doc.imagefile
+
+        context['comments'] = ct
+        context['author'] = get_object_or_404(Doctor,dname=post.author)
         return context
 
     template_name = 'pages/postdetail.html'
@@ -538,8 +624,22 @@ def postpreference(request, **kwargs):
 
     pref = get_object_or_404(Preference, user=request.user, post=post)
     post.save()
-    comments = Comments.objects.filter(post=post)
-    return render(request, 'pages/postdetail.html', {'post': post, 'preference': pref, 'comments': comments})
+    ct = Comments.objects.filter(post=post).order_by('-date')
+        
+    for c in ct:
+        pat = Patient.objects.filter(username=c.author)
+        if pat:
+            pat = get_object_or_404(Patient,username = c.author)
+            c.name = pat.pname
+            c.image = pat.imagefile
+        else:
+            doc = get_object_or_404(Doctor,username=c.author)
+            c.name = doc.dname
+            c.image = doc.imagefile
+
+    author = get_object_or_404(Doctor,dname=post.author)
+    
+    return render(request, 'pages/postdetail.html', {'post': post, 'preference': pref, 'comments':ct,'author':author,})
 
 
 @login_required(login_url='login')

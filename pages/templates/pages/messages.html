@@ -62,28 +62,26 @@
       .form-container .btn:hover, .open-button:hover {
       opacity: 1;
       }
+
+      /* Message  */
+
+        .nav-tabs .glyphicon:not(.no-margin) { margin-right:10px; }
+       
+        .tab-pane .list-group .glyphicon { margin-right:5px; }
+        .tab-pane .list-group .glyphicon:hover { color:#FFBC00; }
+        hr { margin-top: 5px;margin-bottom: 10px; }
+        
 </style>
+
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
 {% endblock %}
 {% block content %}
 
-<h2>Recieved Messages</h2>
-
-{% for msg in message %}
-<h3>{{msg.subject}}</h3>
-<h3>{{msg.content}}</h3>
-
-<a href="{% url 'deletemessage' pk=msg.id %}">
-    Delete
-</a>
-<button class="open-button" id='{{msg.sender}}' onclick="openForm(this.id)">
-    <strong>Reply</strong>
-</button>
-
-{% endfor %}
-
-<br>
-
-
+<h2 style="font-weight: bolder;text-align: center;">Messages</h2>
+<br><br>
 <div id="loginPopup">
     <div class="form-popup" id="popupForm">
         <form action="{% url 'sendmessage' %}" class="form-container">
@@ -106,19 +104,66 @@
         </form>
     </div>
 </div>
-<br><br>
-<h2>Send Messages</h2>
-
-{% for send in send_message %}
-
-<h3>{{send.subject}}</h3>
-
-<a href="{% url 'deletemessage' pk=send.id %}">Delete</a> 
-
-{% endfor %}
 
 
-<br>
+
+<div id='msgdiv'>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#home" data-toggle="tab"><span class="glyphicon glyphicon-inbox">
+        </span>Recieved</a></li>
+        <li><a href="#profile" data-toggle="tab"><span class="
+            glyphicon glyphicon-share"></span>
+            Send</a></li>
+
+        </span></a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane fade in active" id="home">
+            <div class="list-group">
+                {% for msg in message %}
+
+                <a href="#" class="list-group-item">
+                
+
+                    <span class="glyphicon glyphicon-envelope"></span><span class="name" style="min-width: 120px;
+                        display: inline-block;">{{msg.author}}</span> <span class="">{{msg.subject}}</span>
+                    <span class="text-muted" style="font-size: 11px;">-{{msg.content}}</span> <span
+                        class="badge">{{msg.date}}</span>   <span class="pull-right"><span  onclick="openForm('{{msg.sender}}')" class="glyphicon glyphicon-share-alt"></span> </span>
+                </a>
+                          
+                 {% endfor %}
+
+                                 
+                 </a>
+            </div>
+        </div>
+        <div class="tab-pane fade in" id="profile">
+            <div class="list-group">
+                {% for msg in send_message %}
+
+                <a href="#" class="list-group-item">
+                
+
+                    <span class="glyphicon glyphicon-envelope"></span><span class="name" style="min-width: 120px;
+                        display: inline-block;">{{msg.author}}</span> <span class="">{{msg.subject}}</span>
+                    <span class="text-muted" style="font-size: 11px;">-{{msg.content}}</span> <span
+class="badge">{{msg.date}}</span>   <span class="pull-right"><span onclick="document.getElementById('smd').click()" class="glyphicon glyphicon-folder-close"></span></span>
+
+                    <a id='smd' href="{% url 'deletemessage' pk=msg.id %}"></a>
+                </a>
+                          
+                 {% endfor %}
+
+                                 
+                 </a>
+            </div>
+        </div>
+     
+    </div>
+
+</div>
 
 
 
@@ -131,17 +176,24 @@ function openForm(id) {
    
     document.getElementById("rec").value=id;
 
+    $('#msgdiv').css("display", "none");
+
+
   document.getElementById("loginPopup").style.display="block";
 }
 
 function closeForm() {
   document.getElementById("loginPopup").style.display= "none";
+  $('#msgdiv').css("display", "block");
+
 }
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
   var modal = document.getElementById('loginPopup');
   if (event.target == modal) {
     closeForm();
+  $('#msgdiv').css("display", "block");
+
   }
 }
 </script>

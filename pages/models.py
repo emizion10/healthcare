@@ -224,6 +224,8 @@ class Review(models.Model):
     author = models.ForeignKey(Patient, verbose_name="patient",on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, verbose_name="doctor",on_delete=models.CASCADE)
     spec=models.CharField(choices=spec_choices,max_length=50,default='Other')
+    date = models.DateTimeField(auto_now_add=True)
+    
     
     def __str__(self):
         return u'%s  %s' % (self.doctor, self.id)
@@ -276,3 +278,28 @@ class Messages(models.Model):
     
     def __str__(self):
         return str(self.sender) + ':' + str(self.reciever)+':'+str(self.date)
+    
+    
+class Education(models.Model):
+    user = models.ForeignKey(Doctor,on_delete=models.CASCADE)
+    degree_name = models.CharField(max_length=150,null=True,blank=True)
+    institute_name = models.CharField(max_length=150, null=True, blank=True)
+    date_start = models.CharField(null=True,blank=True,max_length=25)
+    date_end = models.CharField(null=True,blank=True,max_length=25)
+    description = models.TextField(null=True,blank=True,max_length=1000)
+    
+    def __str__(self):
+        return str(self.user) + ':' + str(self.degree_name)
+    
+    
+
+class Experience(models.Model):
+    user = models.ForeignKey(Doctor,on_delete=models.CASCADE)
+    designation = models.CharField(max_length=150,null=True,blank=True)
+    hospital_name = models.CharField(max_length=150, null=True, blank=True)
+    date_start = models.CharField(null=True,blank=True,max_length=25)
+    date_end = models.CharField(null=True,blank=True,max_length=25)
+    description = models.TextField(null=True,blank=True,max_length=1000)
+    
+    def __str__(self):
+        return str(self.user) + ':' + str(self.hospital_name)

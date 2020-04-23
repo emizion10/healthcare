@@ -33,6 +33,10 @@ urlpatterns = [
     path('deletemessage/<int:pk>',views.deletemessage, name='deletemessage'),
     path('doctorrecommend/',views.doctorrecommend, name='doctorrecommend'),
     path('predictdoctor/',views.predictdoctor, name='predictdoctor'),
+    path('addeducation/',views.addeducation, name='addeducation'),
+    path('addexperience/',views.addexperience, name='addexperience'),
+    
+    
     
     
     
