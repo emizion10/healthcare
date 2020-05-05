@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://davidstutz.de/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+
+
+	<style type="text/css">
+
+
+		body{
+  font-family: 'Raleway', sans-serif;
+  background: #E9ECE9;
+}
+.comments-main{
+  background: #FFF;
+}
+.comment time, .comment:hover time,.icon-rocknroll, .like-count {
+  -webkit-transition: .25s opacity linear;
+  transition: .25s opacity linear;
+}
+.comments-main ul li{
+  list-style: none;
+}
+.comments .comment {
+  padding: 5px 10px;
+  background: #00AF90;
+}
+.comments .comment:hover time{
+  opacity: 1;
+}
+.comments .user-img img {
+  width: 50px;
+  height: 50px;
+}
+.comments .comment h4 {
+  display: inline-block;
+  font-size: 16px;
+}
+.comments .comment h4 a {
+  color: #404040;
+  text-decoration: none;
+}
+.comments .comment .icon-rocknroll {
+  color: #545454;
+  font-size: .85rem;
+}
+.comments .comment .icon-rocknroll:hover {
+  opacity: .5;
+}
+.comments .comment time,.comments .comment .like-count,.comments .comment .icon-rocknroll {
+  font-size: .75rem;
+  opacity: 0;
+}
+.comments .comment time, .comments .comment .like-count {
+  font-weight: 300;
+}
+.comments .comment p {
+  font-size: 13px;
+}
+.comments .comment p .reply {
+  color: #BFBFA8;
+  cursor: pointer;
+}
+.comments .comment .active {
+  opacity: 1;
+}
+.icon-rocknroll {
+  background: none;
+  outline: none;
+  cursor: pointer;
+  margin: 0 .125rem 0 0;
+}
+.comments .comment:hover .icon-rocknroll,.comments .comment:hover .like-count {
+  opacity: 1;
+}
+.comment-box-main{
+  background: #CA1D5F;
+}
+@media (min-width: 320px) and (max-width: 480px){
+  .comments .comment h4 {
+    font-size: 12px;
+  }
+  .comments .comment p{
+    font-size: 11px;
+  }
+  .comment-box-main .send-btn button{
+    margin-left: 5px;
+  }
+}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+
+
+<script type="text/javascript">
+
+var hd = "<ul class='p-0'><li><div class='row comments mb-2'><div class='col-md-2 col-sm-2 col-3 text-center user-img'><img id='profile-photo' src='http://nicesnippets.com/demo/man01.png' class='rounded-circle' /></div><div class='col-md-9 col-sm-9 col-9 comment rounded mb-2'><h4 class='m-0'><a href='#'>Covid Bot</a></h4><p class='mb-0 text-white'>";
+
+var tl = "</p></div></div></li></ul>";
+
+	var initial =0,sc=0,gsc=0;
+	ar={};
+	evidence=[];
+	ar['evidence']=evidence;
+	// alert(JSON.stringify(ar));
+
+
+function add(){
+	gsid = '#gs'+gsc;
+	var symclicked = $(gsid+" option:selected").text();
+    var evid = $(gsid).val();
+
+	ev={}
+	ev['id']=evid;
+	ev['choice_id']='present';
+	evidence.push(ev);
+    document.getElementById("reply").value = symclicked;
+
+    bot();
+   
+
+}
+
+function present(id){
+	var symclicked = document.getElementById(id).name;
+    var symselected = document.getElementById("reply").value;
+
+    var arr = symselected.split(",");
+	ev={}
+	ev['id']=id;
+	ev['choice_id']='present';
+	evidence.push(ev);
+
+    var i = 0;
+    var flag = -1;
+    while (i < arr.length) {
+        if (arr[i] == symclicked) {
+            flag = 1;
+            break;
+        }
+        i = i + 1;
+    }
+    if (flag == -1) {
+        if (symselected.length > 0){
+            document.getElementById("reply").value = arr.join(",") + "," + symclicked;}
+
+        else{
+            document.getElementById("reply").value = symclicked;
+        }
+
+    }
+
+
+}
+
+
+function absent(id){
+
+	ev={}
+	ev['id']=id;
+	ev['choice_id']='absent';
+	evidence.push(ev);
+
+
+
+}
+
+function yes(id){
+
+	ev={}
+	ev['id']=id;
+	ev['choice_id']='present';
+	evidence.push(ev);
+    document.getElementById("reply").value = "Yes";
+    bot();
+
+
+}
+
+
+function no(id){
+
+	ev={}
+	ev['id']=id;
+	ev['choice_id']='absent';
+	evidence.push(ev);
+    document.getElementById("reply").value = "No";
+    bot();
+
+}
+
+
+
+function single(json){
+	// document.getElementById('res').innerHTML += hd  + json.question.text  + tl ;
+
+        var op='';
+		 $.each(json.question.items, function(i, value) {
+	             op=op+"<button id='"+value.id+"'onclick=yes(this.id)>Yes</button ><button id='"+value.id+"'onclick=no(this.id)>No</button ><br>"
+        });
+         document.getElementById('res').innerHTML += hd+json.question.text+ op  + tl ;
+
+}
+
+
+	function group_single(json){
+		gsc=gsc+1;
+		var op = "<select id='gs" + gsc + "'>";
+		$.each(json.question.items, function(i, value) {
+	             op += "<option value='"+value.id +"'>"+   value.name +"</option>" ;
+	             
+        });
+        op=op+"</select>";
+  document.getElementById('res').innerHTML += hd  + json.question.text + op +"<button onclick=add('gs')>Select</button>" + tl ;
+
+
+	}
+
+
+	function group_multiple(json){
+        // document.getElementById('res').innerHTML += hd  + json.question.text  + tl ;
+
+        var op='<br>';
+		 $.each(json.question.items, function(i, value) {
+	             op=op+value.name+"<button name='"+value.name+"' id='"+value.id+"'onclick=present(this.id)>Present</button ><button id='"+value.id+"'onclick=absent(this.id)>Absent</button ><br>"
+        });
+         document.getElementById('res').innerHTML += hd+json.question.text+ op  + tl ;
+
+		 // op=op+"</select>";
+        
+	}
+
+
+function conversation(input){
+	if(input=='stop'){
+
+		$.ajax({
+				url: 'https://api.infermedica.com/covid19/triage',
+				type: 'post',
+				data:JSON.stringify(ar),
+				headers: {
+				    "App-Id": '0356a9a9',
+				   "App-Key":'116ba23bb4e06e901cdf29af1e8ee809', 
+				   'Content-Type': 'application/json'
+				},
+				dataType: 'json',
+				success: function (json) {
+				    console.info(json);
+					var op="<p class='mb-0 text-white'>Action to Take: "+ json.label +"</p><p class='mb-0 text-white'>Serious Symptoms:-</p>"
+
+					$.each(json.serious, function(i, value) {
+					 op=op+"<p class='mb-0 text-white'> "+ value.name +"</p>"
+
+			        });
+        	 		document.getElementById('res').innerHTML += hd+ json.description +op  + tl ;
+				   
+
+    			},
+    			error: function(xhr, ajaxOptions, thrownError){
+                    alert(xhr.status);
+                },
+		});	
+
+	}
+	else{
+		$.ajax({
+				url: 'https://api.infermedica.com/covid19/diagnosis',
+				type: 'post',
+				data:JSON.stringify(ar),
+				headers: {
+				    "App-Id": '0356a9a9',
+				   "App-Key":'116ba23bb4e06e901cdf29af1e8ee809', 
+				   'Content-Type': 'application/json'
+				},
+				dataType: 'json',
+				success: function (json) {
+				    console.info(json);
+				    if(json.should_stop==true){
+				    	conversation('stop');
+				    }else{
+					     if(json.question.type=='group_multiple'){
+
+	        				group_multiple(json);
+	       				 }
+	       				  else if(json.question.type=='group_single'){
+
+	        				group_single(json);
+	       				 }
+	       				 else if(json.question.type=='single'){
+
+	        				single(json);
+	       				 }
+       				}
+    			},
+    			error: function(xhr, ajaxOptions, thrownError){
+                    alert(xhr.status);
+                },
+		});	
+
+
+	}
+}
+
+	hdu='';
+	function bot(){
+
+	var input = document.getElementById('reply').value;
+
+
+	 document.getElementById('reply').value='';
+
+	if(initial!=0){
+        document.getElementById('res').innerHTML += hdu+ input  + tl ;
+
+		conversation(input);
+	}
+	else{
+
+	initial=1;	
+	var ip = input.split(" ");
+	if(ip[0]=='male'){
+		 hdu = "<ul class='p-0'><li><div class='row comments mb-2'><div class='col-md-2 col-sm-2 col-3 text-center user-img'><img id='profile-photo' src='http://nicesnippets.com/demo/man02.png' class='rounded-circle' /></div><div class='col-md-9 col-sm-9 col-9 comment rounded mb-2'><h4 class='m-0'><a href='#'>You</a></h4><p class='mb-0 text-white'>"
+	}else{
+
+	 hdu = "<ul class='p-0'><li><div class='row comments mb-2'><div class='col-md-2 col-sm-2 col-3 text-center user-img'><img id='profile-photo' src='http://nicesnippets.com/demo/man03.png' class='rounded-circle' /></div><div class='col-md-9 col-sm-9 col-9 comment rounded mb-2'><h4 class='m-0'><a href='#'>You</a></h4><p class='mb-0 text-white'>"
+	}
+
+      document.getElementById('res').innerHTML += hdu+ input  + tl ;
+
+
+	ar['sex']=ip[0];
+	ar['age']=parseInt(ip[1]);
+
+
+		$.ajax({
+    url: 'https://api.infermedica.com/covid19/diagnosis',
+    type: 'post',
+    data:JSON.stringify(ar),
+    headers: {
+        "App-Id": '0356a9a9',
+       "App-Key":'116ba23bb4e06e901cdf29af1e8ee809', 
+       'Content-Type': 'application/json',
+	//    'Version':'v2'
+    },
+    dataType: 'json',
+    success: function (json) {
+        console.info(json);
+
+        if(json.question.type=='group_multiple'){
+        	group_multiple(json);
+        }
+
+        
+
+        
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+                    alert(xhr.status);
+                },
+});	
+
+}	
+	}
+</script>
+
+<title>Covid Chatbot</title>
+  </head>
+  <body>
+	<div class="container">
+		<div class="row mt-5">
+			<div class="col-md-6 offset-md-3 col-sm-6 offset-sm-3 col-12 comments-main pt-4 rounded">
+				<ul class="p-0">
+					<li>
+						<div class="row comments mb-2">
+							<div class="col-md-2 col-sm-2 col-3 text-center user-img">
+						    	<img id="profile-photo" src="http://nicesnippets.com/demo/man01.png" class="rounded-circle" />
+							</div>
+							<div class="col-md-9 col-sm-9 col-9 comment rounded mb-2">
+								<h4 class="m-0"><a href="#">Covid Bot</a></h4>
+							    <p class="mb-0 text-white">Welcome to Covid 19 Chatbot. Enter Your Age and Sex (Eg:- male 30):</p>
+							</div>
+						</div>
+					</li>
+				</ul>
+				
+				<div id='res'></div>
+
+				<div class="row comment-box-main p-3 rounded-bottom">
+			  		<div class="col-md-9 col-sm-9 col-9 pr-0 comment-box">
+					  <input id='reply' type="text" class="form-control" placeholder="Reply ...." />
+			  		</div>
+			  		<div class="col-md-3 col-sm-2 col-2 pl-0 text-center send-btn">
+			  			<button class="btn btn-info" onclick="bot()">Send</button>
+			  		</div>
+				</div>
+			</div>
+		</div>
+	</div>
+  </body>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/0.12.14/vue.min.js'></script>
+</html>
+
+

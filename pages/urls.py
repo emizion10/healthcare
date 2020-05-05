@@ -9,6 +9,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('addp/',AddPatient.as_view(), name='addp'),
     path('addd/',AddDoctor.as_view(), name='addd'),
+    path('covid/',views.covid, name='covid'),
+    
     path('doctorprofile/',DoctorProfile.as_view(), name='doctorprofile'),
     path('patientprofile/',PatientProfile.as_view(), name='patientprofile'),
     path('hospitalprofile/',HospitalProfile.as_view(), name='hospitalprofile'),

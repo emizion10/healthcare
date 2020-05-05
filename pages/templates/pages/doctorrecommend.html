@@ -186,7 +186,6 @@ h6 {
 	</style>
 
 	{% endblock %}
-
 	{% block content %}
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -196,7 +195,7 @@ h6 {
 
 	<div class="container2">
 		<br>
-		<h3>Find doctors near you..</h3>
+		<h3>find doctors near you..</h3>
 	<br>
 	<label class="labeltext"> Specialization: </label>
 	<select id="spec" >
@@ -218,16 +217,17 @@ h6 {
 	<br>
 	
 
-    <label>Chosen Symptoms:</label>
-    
-    <textarea id="sym" rows="2" cols="30">
+	<label>Chosen Symptoms:</label>
+	
+	<!-- <input type="text" id="sym" placeholder="Symptoms" style="height:100px;width:400px;"> -->
+	<textarea id="sym" rows="2" cols="30">
 	</textarea> 
 	
 	<button onclick="clr()">Clear</button>
 
 
 	<br>
-	<label>Location: </label>
+	<label> </label>
 	<input type="text" id="my-address" placeholder="Enter preferred location "> 
 
 
@@ -236,9 +236,7 @@ h6 {
 
 	<br><br>
 
-    <button onclick="sub()" id="btnclass" >SUBMIT</button></p>
-    
-    <br><br>
+	<button onclick="sub()" id="btnclass" >SUBMIT</button></p>
 <div id="sorbyoption">
 	<label> Sort By : </label>
 	<span class="radiogroup" >
@@ -347,7 +345,16 @@ h6 {
 
 				$.get('/home/predictdoctor/',{'latitude':latitude.toString(),'longitude':longitude.toString(),'spec':speclistToString, 'sortby':sortby}, function(data){
 					$("#sorbyoption").show();
-					$("#result").html(data);
+					// window.alert(data);
+					parsed=JSON.parse(data);
+					t="";
+					t=t+"<tr><th>Doctor Name</th><th>Specialization</th><th>Location</th><th>Distance</th></tr>";
+					for(var z in parsed){
+						t=t+"<tr><td><a href='{% url 'index' %}'> " +parsed[z]['name']+"</a></td><td>"+parsed[z]['spec']+"&nbsp;&nbsp;</td><td>"+parsed[z]['location']+"</td><td>"+parsed[z]['distance']+"km&nbsp;</td></tr>";
+
+					}
+					$("#result").html(t);
+							 
 
 
 
@@ -357,7 +364,14 @@ h6 {
 			$("input:radio[name=app]").click(function() {
 				var sortby = $('input[type=radio][name=app]:checked').attr('id');
 				$.get('/home/predictdoctor/',{'latitude':latitude.toString(),'longitude':longitude.toString(),'spec':speclistToString, 'sortby':sortby}, function(data){
-					$("#result").html(data)
+					parsed=JSON.parse(data);
+					t="";
+					t=t+"<tr><th>Doctor Name</th><th>Specialization</th><th>Location</th><th>Distance</th></tr>";
+					for(var z in parsed){
+						t=t+"<tr><td><a href='{% url 'index' %}'> " +parsed[z]['name']+"</a></td><td>"+parsed[z]['spec']+"&nbsp;&nbsp;</td><td>"+parsed[z]['location']+"</td><td>"+parsed[z]['distance']+"km&nbsp;</td></tr>";
+
+					}
+					$("#result").html(t);
 					
 				});
 

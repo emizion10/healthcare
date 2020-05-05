@@ -42,6 +42,9 @@ def home(request):
 def index(request):
     return render(request, 'pages/index.html')
 
+def covid(request):
+    return render(request,'pages/covid.html')
+
 
 def capture(request):
     return render(request, 'pages/capture2.html')
@@ -670,7 +673,7 @@ def logout_view(request):
 import csv
 from math import radians, sin, cos, acos
 # from django.http import HttpResponse
-from .models import Review
+# from .models import Review
 import numpy as np
 import pandas as pd
 from djqscsv import write_csv
@@ -699,12 +702,12 @@ def predictdoctor(request):
 	spec=spec.replace('"','')
 	speclist=list(spec.split(","))
 	sortby=request.GET.get('sortby')
-
+	print(sortby)
 	docs = pd.DataFrame.from_records(Doctor.objects.all().values('id', 'dname','spec','location'))
 	doc=pd.DataFrame(docs.loc[docs['spec'].isin(speclist)])
 	if(doc.shape[0] == 0):
 		return HttpResponse("<h5>No doctors found!!</h5>")
-	
+	print(doc)
 	doc['distance']=0.000000000000
 	latitude=radians(float(request.GET.get('latitude')))
 	longitude=radians(float(request.GET.get('longitude')))
@@ -726,9 +729,11 @@ def predictdoctor(request):
 		lat=radians(float(row["location"].latitude))
 		lon=radians(float(row["location"].longitude))
 		dis=6371.01 * acos(sin(latitude)*sin(lat) + cos(latitude)*cos(lat)*cos(longitude - lon))
+		print(str(i)+"   "+str(dis))
 		doc.iat[i,4]=dis
+		print(doc.iloc[i,4])
 		i=i+1
-	
+	print(doc)
 	combined_df=pd.merge(df,doc,left_on='doctor_id', right_on='id')
 
 	if sortby=='a':
@@ -738,9 +743,7 @@ def predictdoctor(request):
 	else:
 		combined_df['weighted_rating']=combined_df.apply(lambda x: x.distance,axis=1)
 	print(combined_df)
-	result=pd.DataFrame(combined_df.groupby(['doctor_id'],as_index=False)['weighted_rating'].mean())
-	print(result)
-    
+	result=pd.DataFrame(combined_df.groupby(['doctor_id','distance'],as_index=False)['weighted_rating'].mean())
 	if sortby=='a' or sortby=='b':
 		final_df = result.sort_values(by=['weighted_rating'], ascending=False)
 	else:
@@ -748,12 +751,27 @@ def predictdoctor(request):
 	print(final_df)
 	predicted=final_df['doctor_id'].to_list()
 	print(predicted)
+	# json = doc.to_json(orient='records')
 	if len(predicted)==0:
 		return HttpResponse("<h5>No doctors found!!</h5>")
-	t=""
-	t=t+"<tr><th>Doctor Name</th><th>Specialization</th><th>Location</th></tr>"
+	d=final_df['distance'].to_list()
+	# t=""
+	# t=t+"<tr><th>Doctor Name</th><th>Specialization</th><th>Location</th><th>Distance</th></tr>"
+	m=0
+	endlist=[]
+	dic={}
+	# link="{% url 'index' %}"
 	for k in predicted[:]:
+		dic={}
 		query=Doctor.objects.filter(id=k).values('id', 'dname','spec','location')[0]
-		t=t+"<tr><td>"+query['dname']+"</td><td>"+query['spec']+"&nbsp;&nbsp;</td><td>"+query['location'].place+"</td></tr>"
-	
-	return HttpResponse(t)
+		dic['name']=query['dname']
+		dic['spec']=query['spec']
+		dic['location']=query['location'].place
+		dic['distance']="{:.2f}".format(d[m])
+		endlist.append(dic)
+		m=m+1
+		
+	res=json.dumps(endlist)
+	print(endlist)
+	print(res)
+	return HttpResponse(res)
