@@ -40,7 +40,7 @@ def home(request):
 
 
 def index(request):
-    return render(request, 'pages/index.html')
+    return render(request, 'pages/home.html')
 
 def covid(request):
     return render(request,'pages/covid.html')
@@ -312,7 +312,14 @@ class MedicalRecordDetail(MyPermissionMixin, DetailView):
     context_object_name = 'record'
 
     template_name = 'pages/medicalrecord.html'
-
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super(MedicalRecordDetail, self).get_context_data(**kwargs)
+        rec = get_object_or_404(MedicalRecord,id=self.kwargs['pk'])
+        context['patient'] = get_object_or_404(Patient,pname=rec.patient_id)
+        return context
+        
     def test_func(self):
         return (self.request.user.user_type == 2 or self.request.user.user_type == 1)
 

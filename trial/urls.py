@@ -11,7 +11,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/',include('pages.urls')),
-    path('',views.index,name='index'),
+    path('',views.home,name='index'),
     path('symptomchecker/',include('symptomchecker.urls'))
 
 ]

@@ -121,7 +121,10 @@
     <!-- Tab panes -->
     <div class="tab-content">
         <div class="tab-pane fade in active" id="home">
+            {% if message %}
+
             <div class="list-group">
+                
                 {% for msg in message %}
 
                 <a href="#" class="list-group-item">
@@ -138,9 +141,17 @@
                                  
                  </a>
             </div>
+            {% else %}
+            <h2>No Message to Display.</h2> 
+
+                {% endif %}
         </div>
         <div class="tab-pane fade in" id="profile">
+            {% if send_message %}
+
             <div class="list-group">
+
+
                 {% for msg in send_message %}
 
                 <a href="#" class="list-group-item">
@@ -159,6 +170,9 @@ class="badge">{{msg.date}}</span>   <span class="pull-right"><span onclick="docu
                                  
                  </a>
             </div>
+            {% else %}
+              <h2>No Message to Display.</h2> 
+                {% endif %}
         </div>
      
     </div>
