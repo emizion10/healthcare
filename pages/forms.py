@@ -49,21 +49,23 @@ class PatientForm(forms.ModelForm):
     pname = forms.CharField(max_length=100, label='Name')
     gender = forms.ChoiceField(
         choices=GENDER_CHOICES, label='Gender', required=False)
-    dob = forms.DateField(widget=forms.SelectDateWidget(
-        years=YEARS), label='Date of Birth', required=False)
-    age = forms.IntegerField(label='Age', required=False)
+   
     height = forms.DecimalField(label='Height', required=False)
     weight = forms.DecimalField(label='Weight', required=False)
     bloodgroup = forms.ChoiceField(
         choices=bloodgroup_choices, label='Blood Group', required=False)
-    place = forms.CharField(max_length=50, label='Place', required=False)
+    place = forms.CharField(max_length=50, label='Address', required=False,widget=forms.Textarea)
     imagefile = forms.ImageField(required=False, label='Upload Image')
+    email = forms.CharField(max_length=100, label='Email')
+    aadhaar = forms.CharField(max_length=100, label='Aadhaar')
+    contact = forms.CharField(max_length=100, label='Contact')
 
-    # phno = forms.CharField(max_length=20)
+
+    
     class Meta():
         model = MyUser
-        fields = ('username', 'password', 'pname', 'gender', 'dob',
-                  'age', 'height', 'weight', 'bloodgroup', 'place', 'imagefile')
+        fields = ('username', 'password', 'pname', 'gender',
+                  'height', 'weight', 'bloodgroup', 'place', 'imagefile','email','aadhaar','contact')
 
 
 class DoctorForm(forms.ModelForm):

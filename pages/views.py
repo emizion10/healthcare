@@ -104,19 +104,24 @@ class AddPatient(MyPermissionMixin, CreateView):
         username = form.cleaned_data['username']
         pname = form.cleaned_data['pname']
         gender = form.cleaned_data['gender']
-        dob = form.cleaned_data['dob']
-        age = form.cleaned_data['age']
+        dob = self.request.POST['dob']
+        parsed_date = datetime.strptime(dob, "%m/%d/%Y").date()
+        
         height = form.cleaned_data['height']
         weight = form.cleaned_data['weight']
         bloodgroup = form.cleaned_data['bloodgroup']
         place = form.cleaned_data['place']
+        email = form.cleaned_data['email']
+        contact = form.cleaned_data['contact']
+        aadhaar = form.cleaned_data['aadhaar']
+        
         imagefile = self.request.FILES['imagefile']
         password = form.cleaned_data['password']
         usr.set_password(password)
         usr.user_type = 1
         usr.save()
 
-        Patient.objects.create(username=usr, pname=pname, gender=gender, dob=dob, age=age,
+        Patient.objects.create(username=usr, pname=pname, gender=gender, dob=parsed_date, contact=contact,email=email,aadhaar=aadhaar,
                                height=height, weight=weight, bloodgroup=bloodgroup, place=place, imagefile=imagefile)
 
         return super(AddPatient, self).form_valid(form)
@@ -151,7 +156,6 @@ class AddDoctor(MyPermissionMixin, CreateView):
         doc.username = usr
         doc.hos = hospital.name
         parsed_date = datetime.strptime(dob, "%m/%d/%Y").date()
-        print(parsed_date)
         doc.dob = parsed_date
         doc.save()
 
@@ -261,6 +265,22 @@ class MC(MyPermissionMixin, DetailView):
 
     def test_func(self):
         return (self.request.user.user_type == 1)
+
+
+class PatientList(MyPermissionMixin, ListView):
+    raise_exception = True
+    login_url = "/login/"
+    context_object_name = 'patients'
+
+    def get_queryset(self):
+        doc = get_object_or_404(Doctor,username=self.request.user)
+        return MedicalRecord.objects.filter(doctor_id=doc)
+
+    template_name = 'pages/patients.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 2)
+
 
 
 

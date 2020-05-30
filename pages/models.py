@@ -7,7 +7,7 @@ from places.fields import PlacesField
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.fields import GenericRelation
-
+from datetime import datetime
 
 GENDER_CHOICES = (
     (0, 'Male'),
@@ -146,15 +146,20 @@ class Patient(models.Model):
 	pname=models.CharField(max_length=50)
 	gender=models.IntegerField(choices=GENDER_CHOICES,blank=True)
 	dob = models.DateField(null=True, blank=True)
-	age=models.IntegerField(blank=True)
+	# age=models.IntegerField(blank=True)
 	height=models.DecimalField(max_digits=5, decimal_places=2,blank=True)
 	weight=models.DecimalField(max_digits=6, decimal_places=2,blank=True)
 	bloodgroup = models.CharField(choices=bloodgroup_choices, max_length=12, default='-', blank=True)
 	place=models.CharField(max_length=50,blank=True)
 	imagefile=models.ImageField(upload_to='patient/',default="default.jpg",blank=True,null=True)
+	email = models.EmailField(max_length=254,blank=True)
+	contact = models.CharField(max_length=14,blank=True)
+	aadhaar = models.CharField(max_length=12,blank=True)
 	follower = GenericRelation(Follow,related_query_name='patient')
  
-
+	@property
+	def age(self):
+		return int((datetime.now().date() - self.dob).days / 365.25)
 
 	def __str__(self):
 		return self.pname

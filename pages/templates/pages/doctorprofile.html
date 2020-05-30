@@ -308,15 +308,18 @@
 <link
   href="https://fonts.googleapis.com/css?family=Montserrat|Roboto:300,400|Yellowtail"
   rel="stylesheet">
-  
 
-  <script src="{% static 'js/jquery.star-rating-svg.js' %}"></script>
-  <link rel="stylesheet" type="text/css" href="{% static 'css/star-rating-svg.css' %}">
+
+<script src="{% static 'js/jquery.star-rating-svg.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/star-rating-svg.css'
+  %}">
 
 {% if user.user_type == 1 %}
 &nbsp;
-<button style="float: right;margin-left: 1opx;" class="btn btn-success" onclick="openFormreview()">
-  <!-- <a style="color: white;" href="{% url 'doctorreview' %}">Add a Review</a> -->Add Review
+<button style="float: right;margin-left: 1opx;" class="btn btn-success"
+  onclick="openFormreview()">
+  <!-- <a style="color: white;" href="{% url 'doctorreview' %}">Add a Review</a> -->Add
+  Review
 </button>
 
 
@@ -387,6 +390,10 @@
     <div class="rela-block user-desc" id="user_description">{{doctor.get_gender_display}}</div><br>
     <div class="rela-block user-desc" id="user_description">Reg
       Id:{{doctor.regid}}</div><br>
+    <div class="rela-block user-desc" id="user_description">Contact:{{doctor.contact}}</div><br>
+
+    <div class="rela-block user-desc" id="user_description">State:{{doctor.state}}</div><br>
+    <div class="rela-block user-desc" id="user_description">Email:{{doctor.email}}</div><br>
     <div class="rela-block user-desc" id="user_description">Date of Birth
       :{{doctor.dob}}</div><br>
     <div class="rela-block user-desc" id="user_description">Specialisation:{{doctor.spec}}</div><br>
@@ -395,9 +402,9 @@
 
 
   </div>
- 
 
-<!-- Navigation -->
+
+  <!-- Navigation -->
 
   <ul class="nav nav-tabs">
     <li class="active"><a href="#education" data-toggle="tab"><span
@@ -417,179 +424,186 @@
 
   <div class="tab-content">
     <div class="tab-pane fade in active" id="education">
-  <div class="container-fluid"  >
-    {% if user.user_type == 2 %}
-    <button class="btn btn-info" style="float: right;" onclick="div_show()">Add Education</button>
-<br><br>
-<hr>
-{% endif %}
-
-    {% for ed in education %}
-    <h4>Degree : {{ed.degree_name}}</h4>
-    <h4>Institute : {{ed.institute_name}}</h4>
-    <h4>Timeline : {{ed.date_start}} - {{ed.date_end}}</h4>
-    <h4>Description : {{ed.description}}</h4>
-
-    <hr>
-    {% endfor %}
-  </div>
-</div>
-
-    <div class="tab-pane fade  " id="experience">
-      <div class="container-fluid"  >
+      <div class="container-fluid">
         {% if user.user_type == 2 %}
-        <button class="btn btn-info" style="float: right;" onclick="exp_show()">Add Experience</button>
-    <br><br>
-    <hr>
-    {% endif %}
+        <button class="btn btn-info" style="float: right;" onclick="div_show()">Add
+          Education</button>
+        <br><br>
+        <hr>
+        {% endif %}
+
+        {% for ed in education %}
+        <h4>Degree : {{ed.degree_name}}</h4>
+        <h4>Institute : {{ed.institute_name}}</h4>
+        <h4>Timeline : {{ed.date_start}} - {{ed.date_end}}</h4>
+        <h4>Description : {{ed.description}}</h4>
+
+        <hr>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="tab-pane fade"id="experience">
+      <div class="container-fluid">
+        {% if user.user_type == 2 %}
+        <button class="btn btn-info" style="float: right;" onclick="exp_show()">Add
+          Experience</button>
+        <br><br>
+        <hr>
+        {% endif %}
 
         {% for ed in experience %}
         <h4>Degree : {{ed.designation}}</h4>
         <h4>Institute : {{ed.organisation}}</h4>
         <h4>Timeline : {{ed.date_start}} - {{ed.date_end}}</h4>
         <h4>Description : {{ed.description}}</h4>
-    
+
         <hr>
         {% endfor %}
       </div>
     </div>
-    <div class="tab-pane fade  " id="reviews">
-      <div class="container-fluid"  >
-       
+    <div class="tab-pane fade"id="reviews">
+      <div class="container-fluid">
+
         {% for ed in review %}
         <h4>Rating : {{ed.rating}}</h4>
         <h4>Author : {{ed.author}}</h4>
         <h4>Description : {{ed.description}}</h4>
         <h4>Date : {{ed.date}}</h4>
 
-    
+
         <hr>
         {% endfor %}
       </div>
-</div>
-</div>
-
-
-<!-- Add Education -->
-
-<div id="abc">
-  <div id="popupContact">
-
-    <form action="{% url 'addeducation' %}" id="formed" method="post"
-      name="form">
-      {% csrf_token %}
-      <img id="close" src="/media/img/close.jpg" onclick="div_hide()">
-      <h2>Add Education</h2>
-
-      <input class="inped" name="degree" placeholder="Degree" type="text">
-      <input class="inped" name="institute" placeholder="Institute" type="text">
-      <input type="text" name="date_start" placeholder="Date From" id="datefrom"
-        style="width:100%;
-        padding:10px;
-        margin-top:30px;
-        border:1px solid #ccc;
-        padding-left:40px;
-        font-size:16px;
-        font-family:raleway" />
-
-
-      <input type="text" name="date_end" placeholder="Date To" id="dateto"
-        style="width:100%;
-        padding:10px;
-        margin-top:30px;
-        border:1px solid #ccc;
-        padding-left:40px;
-        font-size:16px;
-        font-family:raleway" />
-
-
-
-      <br>
-      <textarea id="msg" name="desc" placeholder="Description"></textarea>
-      <br><br>
-      <button id="submit">Add</button>
-    </form>
+    </div>
   </div>
-</div>
 
 
-<!-- Add Experience -->
+  <!-- Add Education -->
+
+  <div id="abc">
+    <div id="popupContact">
+
+      <form action="{% url 'addeducation' %}" id="formed" method="post"
+        name="form">
+        {% csrf_token %}
+        <img id="close" src="/media/img/close.jpg" onclick="div_hide()">
+        <h2>Add Education</h2>
+
+        <input class="inped" name="degree" placeholder="Degree" type="text">
+        <input class="inped" name="institute" placeholder="Institute"
+          type="text">
+        <input type="text" name="date_start" placeholder="Date From"
+          id="datefrom"
+          style="width:100%;
+          padding:10px;
+          margin-top:30px;
+          border:1px solid #ccc;
+          padding-left:40px;
+          font-size:16px;
+          font-family:raleway" />
 
 
-<div id="exp">
-  <div id="popupContact">
-
-    <form action="{% url 'addexperience' %}" id="formed" method="post"
-      name="form">
-      {% csrf_token %}
-      <img id="close" src="/media/img/close.jpg" onclick="exp_hide()">
-      <h2>Add Experience</h2>
-
-      <input class="inped" name="degree" placeholder="Designation" type="text">
-      <input class="inped" name="institute" placeholder="Organisation" type="text">
-      <input type="text" name="date_start" placeholder="Date From" id="expdatefrom"
-        style="width:100%;
-        padding:10px;
-        margin-top:30px;
-        border:1px solid #ccc;
-        padding-left:40px;
-        font-size:16px;
-        font-family:raleway" />
-
-
-      <input type="text" name="date_end" placeholder="Date To" id="expdateto"
-        style="width:100%;
-        padding:10px;
-        margin-top:30px;
-        border:1px solid #ccc;
-        padding-left:40px;
-        font-size:16px;
-        font-family:raleway" />
+        <input type="text" name="date_end" placeholder="Date To" id="dateto"
+          style="width:100%;
+          padding:10px;
+          margin-top:30px;
+          border:1px solid #ccc;
+          padding-left:40px;
+          font-size:16px;
+          font-family:raleway" />
 
 
 
-      <br>
-      <textarea id="msg" name="desc" placeholder="Description"></textarea>
-      <br><br>
-      <button id="submit">Add</button>
-    </form>
+        <br>
+        <textarea id="msg" name="desc" placeholder="Description"></textarea>
+        <br><br>
+        <button id="submit">Add</button>
+      </form>
+    </div>
   </div>
-</div>
+
+
+  <!-- Add Experience -->
+
+
+  <div id="exp">
+    <div id="popupContact">
+
+      <form action="{% url 'addexperience' %}" id="formed" method="post"
+        name="form">
+        {% csrf_token %}
+        <img id="close" src="/media/img/close.jpg" onclick="exp_hide()">
+        <h2>Add Experience</h2>
+
+        <input class="inped" name="degree" placeholder="Designation"
+          type="text">
+        <input class="inped" name="institute" placeholder="Organisation"
+          type="text">
+        <input type="text" name="date_start" placeholder="Date From"
+          id="expdatefrom"
+          style="width:100%;
+          padding:10px;
+          margin-top:30px;
+          border:1px solid #ccc;
+          padding-left:40px;
+          font-size:16px;
+          font-family:raleway" />
+
+
+        <input type="text" name="date_end" placeholder="Date To" id="expdateto"
+          style="width:100%;
+          padding:10px;
+          margin-top:30px;
+          border:1px solid #ccc;
+          padding-left:40px;
+          font-size:16px;
+          font-family:raleway" />
 
 
 
-<!-- Add Review -->
-
-<div id="reviewpopup">
-  <div class="form-popup" id="popupForm">
-    <form action="{% url 'doctorreview' %}" class="form-container" method="POST">
-      {% csrf_token %}
-
-      <h2>Review</h2>
-      <label for="email">
-        <strong>Rating</strong>
-      </label>
-      
-    <div class="my-rating"></div>
-    <input style="display: none;" type="number" id='rating' name='rating'>
-
-      <label for="psw">
-        <strong>Feedback</strong>
-      </label>
-      <textarea id="psw" placeholder="Content" name="description" required></textarea>
-      <input type="hidden" value="{{doctor.dname}}" name="doctor">
-      <button type="submit" class="btn">Confirm</button>
-      <button type="button" class="btn cancel" onclick="closeFormreview()">Cancel</button>
-    </form>
+        <br>
+        <textarea id="msg" name="desc" placeholder="Description"></textarea>
+        <br><br>
+        <button id="submit">Add</button>
+      </form>
+    </div>
   </div>
-</div>
 
 
-{% endblock %}
 
-{% block endscript %}
+  <!-- Add Review -->
 
-<script>
+  <div id="reviewpopup">
+    <div class="form-popup" id="popupForm">
+      <form action="{% url 'doctorreview' %}" class="form-container"
+        method="POST">
+        {% csrf_token %}
+
+        <h2>Review</h2>
+        <label for="email">
+          <strong>Rating</strong>
+        </label>
+
+        <div class="my-rating"></div>
+        <input style="display: none;" type="number" id='rating' name='rating'>
+        <label for="psw">
+          <strong>Feedback</strong>
+        </label>
+        <textarea id="psw" placeholder="Content" name="description" required></textarea>
+        <input type="hidden" value="{{doctor.dname}}" name="doctor">
+        <button type="submit" class="btn">Confirm</button>
+        <button type="button" class="btn cancel" onclick="closeFormreview()">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+
+  {% endblock %}
+
+  {% block endscript %}
+
+  <script>
 
 $(document).ready(function(){
   $(".nav-tabs a").click(function(){
@@ -676,4 +690,4 @@ $(".my-rating").starRating({
     });
 
 </script>
-{% endblock %}
+  {% endblock %}

@@ -10,6 +10,7 @@ urlpatterns = [
     path('addp/',AddPatient.as_view(), name='addp'),
     path('addd/',AddDoctor.as_view(), name='addd'),
     path('covid/',views.covid, name='covid'),
+    path('patients/',PatientList.as_view(), name='patients'),
     
     path('doctorprofile/',DoctorProfile.as_view(), name='doctorprofile'),
     path('patientprofile/',PatientProfile.as_view(), name='patientprofile'),
