@@ -171,7 +171,10 @@ class Doctor(models.Model):
 	imagefile=models.ImageField(upload_to='doctor/',default="default.jpg",blank=True,null=True)
 	location = PlacesField()
 	follower = GenericRelation(Follow,related_query_name='doctor')
-	
+	state=models.CharField(max_length=20,blank=True)
+	email = models.EmailField(max_length=254,blank=True)
+	contact = models.CharField(max_length=14,blank=True)
+	aadhaar = models.CharField(max_length=12,blank=True)
 	
 
 

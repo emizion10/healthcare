@@ -20,6 +20,10 @@ bloodgroup_choices = (('apos', 'A+'),
                       ('abneg', 'AB-'),
                       ('unspecified', '-')
                       )
+
+state_choices = (("Andhra Pradesh","Andhra Pradesh"),("Arunachal Pradesh","Arunachal Pradesh"),("Assam","Assam"),("Bihar","Bihar"),("Chhattisgarh","Chhattisgarh"),("Goa","Goa"),("Gujarat","Gujarat"),("Haryana","Haryana"),("Himachal Pradesh","Himachal Pradesh"),("Jammu and Kashmir","Jammu and Kashmir"),("Jharkhand","Jharkhand"),("Karnataka","Karnataka"),("Kerala","Kerala"),("Madhya Pradesh","Madhya Pradesh"),("Maharashtra","Maharashtra"),("Manipur","Manipur"),("Meghalaya","Meghalaya"),("Mizoram","Mizoram"),("Nagaland","Nagaland"),("Odisha","Odisha"),("Punjab","Punjab"),("Rajasthan","Rajasthan"),("Sikkim","Sikkim"),("Tamil Nadu","Tamil Nadu"),("Telangana","Telangana"),("Tripura","Tripura"),("Uttarakhand","Uttarakhand"),("Uttar Pradesh","Uttar Pradesh"),("West Bengal","West Bengal"),("Andaman and Nicobar Islands","Andaman and Nicobar Islands"))
+
+
 YEARS = [x for x in range(1920, 2020)]
 
 
@@ -98,19 +102,25 @@ class DoctorForm(forms.ModelForm):
     regid = forms.CharField(max_length=60, label='Registration No.')
     dname = forms.CharField(max_length=100, label='Name')
     gender = forms.ChoiceField(
-        choices=GENDER_CHOICES, required=False, label='Gender')
-    dob = forms.DateField(widget=forms.SelectDateWidget(
-        years=YEARS), required=False, label='Date of Birth')
+        choices=GENDER_CHOICES, label='Gender')
+    
     spec = forms.ChoiceField(choices=spec_choices,
                              required=False, label='Specialization Area')
-    hos = forms.CharField(max_length=150, required=False,
-                          label='Hospital Name')
+    # hos = forms.CharField(max_length=150, required=False,
+    #                       label='Hospital Name')
     imagefile = forms.ImageField(required=False, label='Upload Image')
+    state = forms.ChoiceField(choices=state_choices,required=True, label='State')
+    email = forms.CharField(max_length=100, label='Email')
+    aadhaar = forms.CharField(max_length=100, label='Aadhaar')
+    contact = forms.CharField(max_length=100, label='Contact')
+
+
+
 
     class Meta():
         model = Doctor
-        fields = ('us', 'password', 'regid', 'dname',
-                  'dob', 'gender', 'spec', 'hos', 'imagefile', 'location')
+        fields = ('us', 'password', 'regid', 'dname'
+                  , 'gender', 'spec', 'imagefile','state','email','aadhaar','contact', 'location')
 
     def clean_regid(self):
         if Doctor.objects.filter(regid__iexact=self.cleaned_data['regid']):

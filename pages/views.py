@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from . decorators import *
 from django.urls import reverse
 from django.db.models import Q
-
+from datetime import datetime
 
 @login_required(login_url='login')
 def home(request):
@@ -136,7 +136,7 @@ class AddDoctor(MyPermissionMixin, CreateView):
     def form_valid(self, form):
         doc = form.save(commit=False)
         username = form.cleaned_data['us']
-
+        dob = self.request.POST['dob']
         imagefile = self.request.FILES['imagefile'] if 'imagefile' in self.request.FILES else False
         if imagefile == False:
             imagefile = 'default.jpg'
@@ -147,7 +147,12 @@ class AddDoctor(MyPermissionMixin, CreateView):
         usr.set_password(password)
         usr.user_type = 2
         usr.save()
+        hospital = get_object_or_404(Hospital,username=self.request.user)
         doc.username = usr
+        doc.hos = hospital.name
+        parsed_date = datetime.strptime(dob, "%m/%d/%Y").date()
+        print(parsed_date)
+        doc.dob = parsed_date
         doc.save()
 
         return super(AddDoctor, self).form_valid(form)
