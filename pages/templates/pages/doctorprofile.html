@@ -296,9 +296,9 @@
 {% endblock %}
 
 {% block content %}
-<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
   rel="stylesheet" id="bootstrap-css">
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
 <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js"
@@ -311,10 +311,11 @@
 
 
 <script src="{% static 'js/jquery.star-rating-svg.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'css/star-rating-svg.css'
-  %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/star-rating-svg.css' %}">
 
 {% if user.user_type == 1 %}
+
+
 &nbsp;
 <button style="float: right;margin-left: 1opx;" class="btn btn-success"
   onclick="openFormreview()">
@@ -402,8 +403,14 @@
 
 
   </div>
+{%  if profile %}
 
+<center>
+  <a href="{% url 'changepassword' %}" class='btn btn-success'>Change Password</a>
+</center>
+{% endif %}
 
+<hr>
   <!-- Navigation -->
 
   <ul class="nav nav-tabs">
@@ -425,7 +432,9 @@
   <div class="tab-content">
     <div class="tab-pane fade in active" id="education">
       <div class="container-fluid">
-        {% if user.user_type == 2 %}
+       
+        {%  if profile%}
+
         <button class="btn btn-info" style="float: right;" onclick="div_show()">Add
           Education</button>
         <br><br>
@@ -445,7 +454,8 @@
 
     <div class="tab-pane fade"id="experience">
       <div class="container-fluid">
-        {% if user.user_type == 2 %}
+        {%  if profile %}
+
         <button class="btn btn-info" style="float: right;" onclick="exp_show()">Add
           Experience</button>
         <br><br>
@@ -466,7 +476,8 @@
       <div class="container-fluid">
 
         {% for ed in review %}
-        <h4>Rating : {{ed.rating}}</h4>
+        <h4 >Rating : {{ed.rating}}</h4>
+        <div id='ed' ></div>
         <h4>Author : {{ed.author}}</h4>
         <h4>Description : {{ed.description}}</h4>
         <h4>Date : {{ed.date}}</h4>
@@ -605,11 +616,35 @@
 
   <script>
 
+// Star
+$(".my-rating").starRating({
+        initialRating: 3,
+        useFullStars:true,
+        strokeColor: '#894A00',
+        strokeWidth: 10,
+        starSize: 25,
+      callback:function(currentRating,$el){
+        document.getElementById('rating').value = currentRating;
+      }
+
+    
+    });
+
+
+
 $(document).ready(function(){
   $(".nav-tabs a").click(function(){
     $(this).tab('show');
   });
+
+
+
+
 });
+
+function rating(id){
+  alert(id);
+}
 
 // Data Picker Initialization
 $('#datefrom').datepicker();
@@ -675,19 +710,6 @@ window.onclick = function(event) {
   }
 }
 
-// Star
-$(".my-rating").starRating({
-        initialRating: 3,
-        useFullStars:true,
-      strokeColor: '#894A00',
-      strokeWidth: 10,
-      starSize: 25,
-      callback:function(currentRating,$el){
-        document.getElementById('rating').value = currentRating;
-      }
-
-    
-    });
 
 </script>
   {% endblock %}

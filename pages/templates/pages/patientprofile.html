@@ -174,9 +174,17 @@
         <div class="rela-block user-desc" id="user_description">Age :{{patient.age}}</div><br>
         <div class="rela-block user-desc" id="user_description">Date of Birth :{{patient.dob}}</div><br>
         <div class="rela-block user-desc" id="user_description">BloodGroup :{{patient.get_bloodgroup_display}}</div><br>
-        
-        <br>
+{%  if user.user_type == 1 %}
+       
+        <center>
+          <a href="{% url 'changepassword' %}" class='btn btn-success'>Change Password</a>
+        </center>
+        {% endif %}
+        <br><hr>
         <div class="rela-block user-name" id="user_name">Medical Records</div>
+        {% if not records %}
+        <h4 style="color: #999;">No Records to Show.</h4>
+        {% endif %}
         {% for rec in records %}
         <a href="{% url 'medicalrecord' pk=rec.pk %}">
             <h3>{{rec.condition}} | {{rec.visit_date}}</h3>

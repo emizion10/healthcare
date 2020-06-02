@@ -141,36 +141,119 @@
   }
 
 
+  /* Doctor */
+
+  .card {position: relative; border-radius: 3px; background-color: #fff;color: #4f5256;border: 1px solid #f2f2f2;margin-bottom: 16px;background:#fff;}
+.card-header{ padding: 16px;margin:0px;}
+.card-body {position: relative; padding: 16px;}
+
+.gaadiex-list {list-style-type: none; margin: 0;padding: 0;}
+.gaadiex-list>.gaadiex-list-item {padding: 0 22px;}
+.gaadiex-list-item-img  {
+    float: left;
+    width: 58px;
+    height: 58px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+.gaadiex-list-item i  {
+    float: left;
+    font-size:48px;
+    width: 58px;
+    height: 58px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+.border-b-1 {border-bottom: 1px solid rgba(162,162,162,.16);}
+
+a:link {
+  text-decoration: none;
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
-    rel="stylesheet" id="bootstrap-css">
+  rel="stylesheet" id="bootstrap-css">
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <link
-    href="https://fonts.googleapis.com/css?family=Montserrat|Roboto:300,400|Yellowtail"
-    rel="stylesheet">
+  href="https://fonts.googleapis.com/css?family=Montserrat|Roboto:300,400|Yellowtail"
+  rel="stylesheet">
 
 <br>
 <div class="rela-block profile-card">
-    <div class="profile-pic" id="profile_pic">
+  <div class="profile-pic" id="profile_pic">
 
+  </div>
+  <div class="rela-block profile-name-container">
+    <div class="rela-block user-name" id="user_name">{{hospital.name}}</div>
+    <div class="rela-block user-desc" id="user_description">{{hospital.regid}}</div><br>
+    <div class="rela-block user-desc" id="user_description">Category
+      :{{hospital.category}}</div><br>
+    <div class="rela-block user-desc" id="user_description">Specialisations
+      :{{hospital.spec}}</div><br>
+
+    <div class="rela-block user-desc" id="user_description">Services
+      :{{hospital.services}}</div><br>
+    <div class="rela-block user-desc" id="user_description">Address
+      :{{hospital.address}}</div><br>
+
+    <div class="rela-block user-desc" id="user_description">Location
+      :{{hospital.location.place}}</div><br>
+    <div class="rela-block user-desc" id="user_description">Email
+      :{{hospital.email}}</div><br>
+    <div class="rela-block user-desc" id="user_description">Contact
+      :{{hospital.contact}}</div><br>
+
+    <div class="rela-block user-desc" id="user_description">Website
+      :{{hospital.url}}</div><br>
+    <div class="rela-block user-desc" id="user_description">Description
+      :{{hospital.description}}</div><br>
+
+    <br>
+
+
+
+  </div>
+{%  if user.user_type == 3 %}
+
+  <center>
+    <a href="{% url 'changepassword' %}" class='btn btn-success'>Change Password</a>
+  </center>
+  {% endif %}
+  <br>
+</div>
+<br>
+<div class="card">
+  <div class="card-header">
+    <h4>Doctors</h4>
+  </div>
+  <div class="gaadiex-list">
+    <div class="row">
+      {% for doctor in doctors %}
+		<div class="col-md-6">
+
+      <br>
+      <div class="gaadiex-list-item border-b-1"><img
+          class="gaadiex-list-item-img" src="{{doctor.imagefile.url}}"alt="List
+          user">
+        <div class="gaadiex-list-item-text">
+          <h3><a href="">{{doctor.dname}}</a></h3>
+
+          <h4>{{doctor.spec}}</h4>
+          <br><br>
+        </div>
+      </div>
+		</div>
+      {% endfor %}
     </div>
-    <div class="rela-block profile-name-container">
-        <div class="rela-block user-name" id="user_name">{{hospital.name}}</div>
-        <div class="rela-block user-desc" id="user_description">{{hospital.regid}}</div><br>
-        <div class="rela-block user-desc" id="user_description">Location :{{hospital.location.place}}</div><br>
-        <div class="rela-block user-desc" id="user_description">Email :{{hospital.email}}</div><br>
-        <div class="rela-block user-desc" id="user_description">Website :{{hospital.url}}</div><br>
-        
-        <br>
-      
-
-
-    </div>
-
+  </div>
 </div>
 
 

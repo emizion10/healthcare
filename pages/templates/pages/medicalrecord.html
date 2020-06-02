@@ -202,7 +202,8 @@
                         <label>Procedures:</label>
                         {% for i in record.procedures %}
                         {% if user.user_type == 5 %}
-                        <li> {{i}} &emsp; <button class="btn btn-success" onclick="openForm('{{i}}')">Add</button>  </li>
+                        <li> {{i}} &emsp; <button class="btn btn-success"
+                                onclick="openForm('{{i}}')">Add</button> </li>
                         {% else %}
                         <li> {{i}}</li>
                         {% endif %}
@@ -228,8 +229,11 @@
                     <button id='savebtn' type="button" onclick="change()"
                         class="btn btn-success" disabled='true'>Save</button>
                     <br><br>
-
+                    <div id='cp'>
+                    </div>
+                    <br>
                     <input id='custom' type="text">
+
                     {% endif %}
 
                     <br>
@@ -237,12 +241,14 @@
                 </div>
 
 
-<hr>    
-<h4>Laboratory Records</h4>
-{% for r in labrec %}
-<h5>{{r.procedure}} &emsp;<a class="btn btn-danger" href="{{r.upload_file.url}}">Open</a> </h5>
-{% endfor %}
-
+                <hr>
+                {%if labrec %}
+                <h4>Laboratory Records</h4>
+                {% for r in labrec %}
+                <h5>{{r.procedure}} &emsp;<a class="btn btn-danger"
+                        href="{{r.upload_file.url}}">Open</a> </h5>
+                {% endfor %}
+                {% endif %}
             </div>
 
 
@@ -250,35 +256,37 @@
 
     </div>
 
-    
 
-<div id="loginPopup">
-    <div class="form-popup" id="popupForm">
-      <form action="{% url 'addlaboratoryrecord' %}" method="POST" class="form-container"  enctype="multipart/form-data">
-        {% csrf_token %}
-        <h2>Laboratory Record</h2>
-        <label for="email">
-          <strong>Procedure</strong>
-        </label>
-        <input type="text" id="email"  name="procedure"
-          required>
-        <label for="psw">
-          <strong>Description</strong>
-        </label>
-        <textarea id="psw" placeholder="Description" name="desc" required></textarea>
-        <label for="psw">
-            <strong>File</strong>
-          </label>
-          <input type="file" name='labfile'>
-          <br>
-        <input type="hidden" value="{{record.id}}" name="medrec">
-        <button type="submit" class="btn">Submit</button>
-        <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
-      </form>
+
+    <div id="loginPopup">
+        <div class="form-popup" id="popupForm">
+            <form action="{% url 'addlaboratoryrecord' %}" method="POST"
+                class="form-container" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h2>Laboratory Record</h2>
+                <label for="email">
+                    <strong>Procedure</strong>
+                </label>
+                <input type="text" id="email" name="procedure"
+                    required>
+                <label for="psw">
+                    <strong>Description</strong>
+                </label>
+                <textarea id="psw" placeholder="Description" name="desc"
+                    required></textarea>
+                <label for="psw">
+                    <strong>File</strong>
+                </label>
+                <input type="file" name='labfile'>
+                <br>
+                <input type="hidden" value="{{record.id}}" name="medrec">
+                <button type="submit" class="btn">Submit</button>
+                <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
+            </form>
+        </div>
     </div>
-  </div>
-  
-  
+
+
 
     <!-- end -->
 
@@ -289,6 +297,7 @@
     {% block endscript %}
     <script type="text/javascript">
         $('#custom').hide();
+
     var mid = "{{record.id}}"
     var perm = "{{record.permission}}";
     $('#perm').val(perm);
@@ -301,6 +310,17 @@
     $('#perm').on('change', function() {
         document.getElementById("savebtn").disabled = false;
     if (this.value=='custom'){
+        $.get(mid+'/doctorstreated', function(data){
+            op='<select>';
+            op=op+data;
+            op=op+'</select>'
+           
+	 	$('#cp').html(op);
+	 	
+    	
+  });
+
+
         $('#custom').show();
     }
     else{

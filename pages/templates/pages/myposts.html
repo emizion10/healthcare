@@ -13,18 +13,116 @@
                 Post</a>
         </div>
     </div>
-
+    <hr>
     <br>
-    <div class="row">
+    <!-- <div class="row">
+        {% if not posts %}
+        <h5 style="color: cadetblue;">No Posts to show ! Start Writing Something.</h5>
+        {% endif %}
     {% for post in posts %}
-
         <div class="col-xs-12 col-sm-6 col-md-4">
+    <div class="card">
+
             <h2>{{post.title}}</h2>
-            <h3>{{post.content|truncatewords:30}}</h3>
+            <h5>{{post.content|truncatewords:30}}</h5>
 
         </div>
+    </div>
     {% endfor %}
 
+    </div> -->
+
+
+
+    <div class="row">
+
+        {% for post in posts %}
+    
+        <div class="col-xs-12 col-sm-6 col-md-6">
+    
+            <div class="card-container">
+                <div class="card">
+                    <div class="front">
+                        <div class="cover">
+                            <img src="{{post.image.url}}" />
+    
+                        </div>
+                        <div class="user">
+    
+                            <img class="img-circle" src="{{author.imagefile.url}}" />
+                        </div>
+                        <div class="content">
+                            <div class="main">
+                                <h3 class="name">{{post.title}}</h3>
+                                <p class="profession">{{post.content|truncatewords:30}}</p>
+                                <div class="footer">
+                                    <p class="profession">Author:{{post.author}}</p>
+                                </div>
+    
+                            </div>
+    
+    
+                        </div>
+                    </div> <!-- end front panel -->
+                    <div class="back">
+                        <div class="header">
+                            <h5 class="motto">{{post.created_date}}</h5>
+                        </div>
+                        <div class="content">
+                            <div class="main">
+                                <h4 class="text-center">Comments</h4>
+                                {% for c in post.comment %}
+                                    <p class="text-center">{{c.comment}} | {{c.author}}</p>
+                                {% endfor %}
+    
+                                <!-- <p class="text-center">{{post.content|truncatewords:30}}</p> -->
+                                <div class="stats-container">
+                                    <div class="stats">
+                                        <h4>{{post.likes}}</h4>
+                                        <p>
+                                            Likes
+                                        </p>
+                                    </div>
+                                    <div class="stats">
+                                        <h4>{{post.dislikes}}</h4>
+                                        <p>
+                                            Dislikes
+                                        </p>
+                                    </div>
+                                    <div class="stats">
+                                        <h4>{{post.count}}</h4>
+                                        <p>
+                                            Comments
+                                            
+                                        </p>
+                                    </div>
+    
+                                </div>
+    <br>
+                            </div>
+                        </div>
+                        <div class="footer">
+                            <div class="social-links text-center">
+                                <a href="{% url 'postdetail' pk=post.pk %}"
+                                    class="facebook">Read More</a>
+    
+                            </div>
+                        </div>
+    
+                    </div> <!-- end back panel -->
+                </div> <!-- end card -->
+            </div>
+        </div>
+        {% endfor %}
+    
     </div>
+
+
+
+
+
+
+
+
 </div>
 {% endblock %}

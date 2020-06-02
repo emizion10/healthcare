@@ -11,6 +11,7 @@ urlpatterns = [
     path('addd/',AddDoctor.as_view(), name='addd'),
     path('covid/',views.covid, name='covid'),
     path('patients/',PatientList.as_view(), name='patients'),
+    path('changepassword/',views.change_password, name='changepassword'),
     
     path('doctorprofile/',DoctorProfile.as_view(), name='doctorprofile'),
     path('patientprofile/',PatientProfile.as_view(), name='patientprofile'),
@@ -20,6 +21,7 @@ urlpatterns = [
     path('laboratory/',LabRecord.as_view(), name='laboratory'),
     path('laboratory/labpatient',views.labpatient, name='labpatient'),
     path('addlaboratoryrecord/',views.addlabrecord, name='addlaboratoryrecord'),
+    path('medicalrecord/<int:pk>/doctorstreated',views.doctorstreated, name='doctorstreated'),
     
     path('treatpatient/patient',treatpatientprofile, name='patient'),
     path('treatpatient/medicalrecord',views.addmedicalrecord, name='addmedicalrecord'),

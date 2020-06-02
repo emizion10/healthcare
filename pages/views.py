@@ -1,5 +1,7 @@
 from . models import *
 from . forms import *
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -30,13 +32,14 @@ def home(request):
     else:
         post = Post.objects.filter().order_by('-created_date')
 
-    ct = Comments.objects.filter()
+    # ct = Comments.objects.filter()
     for p in post:
+        p.author = get_object_or_404(Doctor,dname=p.author)
         p.comment=Comments.objects.filter(post=p).order_by('-date')[:2]
         p.count=Comments.objects.filter(post=p).count()
         
     
-    return render(request, 'pages/home.html', {'posts': post,'comment':ct})
+    return render(request, 'pages/home.html', {'posts': post})
 
 
 def index(request):
@@ -87,6 +90,26 @@ def login_view(request):
     return render(request, "registration/login.html", {'form': form})
 
 
+def change_password(request):
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            new_password = request.POST['new_password']
+            usr = get_object_or_404(MyUser,username=request.user)
+            usr.set_password(new_password)
+            usr.save()
+            update_session_auth_hash(request, usr)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = ChangePasswordForm()
+    return render(request, 'registration/change_password.html', {
+        'form': form
+    })
+    
+    
 class AddPatient(MyPermissionMixin, CreateView):
 
     raise_exception = True
@@ -177,6 +200,7 @@ class DoctorProfile(MyPermissionMixin, DetailView):
         context['education'] = Education.objects.filter(user=doc)
         context['experience'] = Experience.objects.filter(user=doc)
         context['review'] = Review.objects.filter(doctor=doc)
+        context['profile']=True
         
         return context
     
@@ -246,6 +270,12 @@ class HospitalProfile(MyPermissionMixin, DetailView):
 
     def get_object(self):
         return get_object_or_404(Hospital, username=self.request.user)
+    
+    def get_context_data(self, **kwargs):
+        context = super(HospitalProfile, self).get_context_data(**kwargs)
+        hs = get_object_or_404(Hospital, username=self.request.user)
+        context['doctors'] = Doctor.objects.filter(hos=hs.name)
+        return context
 
     template_name = 'pages/hospitalprofile.html'
 
@@ -356,11 +386,13 @@ def addmedicalrecord(request):
         form = MedicalRecordForm(request.POST)
         if form.is_valid():
             medrecord = form.save(commit=False)
-            medrecord.permission = 'private'
+            medrecord.permission = 'public'
             medrecord.doctor_id = get_object_or_404(
                 Doctor, username=request.user)
             medrecord.patient_id = get_object_or_404(
                 Patient, regid=request.session['regid'])
+            proc = form.cleaned_data['procedures']
+            print(proc,'sd')
             medrecord.save()
             pt = get_object_or_404(Patient, regid=request.session['regid'])
             doc = get_object_or_404(Doctor, username=request.user)
@@ -373,6 +405,17 @@ def addmedicalrecord(request):
 
     return render(request, 'pages/addmedicalrecord.html', {'forms': form,'patient':pt})
 
+
+@user_is_patient
+def doctorstreated(request,**args):
+    pt = get_object_or_404(Patient,username=request.user)
+    mrec = MedicalRecord.objects.filter(patient_id=pt).order_by('doctor_id').values('doctor_id').distinct()
+    s=''
+    print(mrec)
+    for m in mrec:
+        doc = get_object_or_404(Doctor,id=m['doctor_id'])
+        s=s+"<option value='"+doc.dname+"' name='"+doc.dname+"'>"+doc.dname+"</option>"
+    return HttpResponse(s)
 
 class MedicalRecordDetail(MyPermissionMixin, DetailView):
     raise_exception = True
@@ -415,8 +458,10 @@ class ViewDoctor(MyPermissionMixin, DetailView):
     context_object_name = 'doctor'
 
     def get_object(self, *args, **kwargs):
-        # self.request.session['doctor'] = self.kwargs['slug']
-        return get_object_or_404(Doctor, dname=self.kwargs['slug'])
+        print(self.kwargs['slug'])
+        self.request.session['doctor'] = self.kwargs['slug']
+        usr = get_object_or_404(MyUser,username=self.kwargs['slug'])
+        return get_object_or_404(Doctor, username=usr)
 
     def get_context_data(self, **kwargs):
         context = super(ViewDoctor, self).get_context_data(**kwargs)
@@ -425,13 +470,19 @@ class ViewDoctor(MyPermissionMixin, DetailView):
         elif self.request.user.user_type == 2:
             pt = get_object_or_404(Doctor, username=self.request.user)
 
-        doc = get_object_or_404(Doctor, dname=self.kwargs['slug'])
+        usr = get_object_or_404(MyUser,username=self.kwargs['slug'])
+
+        doc = get_object_or_404(Doctor, username=usr)
         followers = pt.follower.filter(following=doc)
         if followers:
             context['follow'] = 'True'
         else:
             context['follow'] = 'False'
-            
+        
+        if doc.username==self.request.user:
+            context['profile']=True
+        else:
+            context['profile']=False    
         context['education'] = Education.objects.filter(user=doc)
         context['experience'] = Experience.objects.filter(user=doc)
         context['review'] = Review.objects.filter(doctor=doc)
@@ -503,7 +554,7 @@ def sendmessage(request):
     else:    
         doc = get_object_or_404(Doctor, username=rec)
         
-        return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
+        return HttpResponseRedirect(reverse('viewdoctor', args=(doc.username,)))
 
 @login_required(login_url='login')
 def deletemessage(request,**kwargs):
@@ -569,7 +620,7 @@ def followdoctor(request, **kwargs):
 
     doc = get_object_or_404(Doctor, id=kwargs['pk'])
     Follow.objects.create(following=doc, follower=pt)
-    return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
+    return HttpResponseRedirect(reverse('viewdoctor', args=(doc.username,)))
 
 @login_required(login_url='login')
 def unfollowdoctor(request, **kwargs):
@@ -601,7 +652,7 @@ def addreview(request):
         author = get_object_or_404(
             Patient, username=request.user)
         Review.objects.create(rating=rating,description=description,author=author,spec=spec,doctor=doc)
-        return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
+        return HttpResponseRedirect(reverse('viewdoctor', args=(doc.username,)))
         
 
 
@@ -613,8 +664,16 @@ class DoctorPosts(MyPermissionMixin, ListView):
     def get_queryset(self):
         dt = get_object_or_404(Doctor, username=self.request.user)
         queryset = Post.objects.filter(author=dt)
+        for p in queryset:
+            p.comment=Comments.objects.filter(post=p).order_by('-date')[:2]
+            p.count=Comments.objects.filter(post=p).count()
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super(DoctorPosts, self).get_context_data(**kwargs)
+        context['author'] = get_object_or_404(Doctor, username=self.request.user)
+        return context    
+    
     template_name = 'pages/myposts.html'
 
     def test_func(self):
@@ -627,8 +686,12 @@ def addpost(request):
         form = PostForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
+            image = request.FILES['image'] if 'image' in request.FILES else False
+            if image == False:
+                image = 'postdefault.png'
             post.author = get_object_or_404(
                 Doctor, username=request.user)
+            post.image=image
             post.save()
             dt = get_object_or_404(Doctor, username=request.user)
             pt = Post.objects.filter(author=dt)
@@ -673,7 +736,7 @@ class PostDetail(MyPermissionMixin, DetailView):
     template_name = 'pages/postdetail.html'
 
     def test_func(self):
-        return (self.request.user.user_type == 1 or self.request.user.user_type == 2)
+        return (self.request.user.user_type == 1 or self.request.user.user_type == 2 or self.request.user.user_type == 3 or self.request.user.user_type == 5)
 
 
 @login_required(login_url='login')

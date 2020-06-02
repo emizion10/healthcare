@@ -164,6 +164,9 @@ input[type="file"]{
                     <div class="tab-content">
                         <div class="tab-pane active" id="comments-logout">
                             <ul class="media-list">
+                                {% if not comments %}
+                                <h5>No Comments to Show!</h5>
+                                {% endif %}
                                 {% for c in comments %}
 
                                 <li class="media">
@@ -224,7 +227,7 @@ input[type="file"]{
                                             btn-circle text-uppercase"
                                             type="button" id="submitComment"  onclick="document.getElementById('commentForm').submit()" ><span
                                                 class="glyphicon
-                                                glyphicon-send"  ></span> Summit
+                                                glyphicon-send"  ></span> Submit
                                             comment</button>
                                     </div>
                                 </div>

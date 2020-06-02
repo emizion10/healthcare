@@ -51,11 +51,15 @@ a:link {
 		            <h4>Following</h4>
 		        </div>
 		        <div class="gaadiex-list">
+              {% if not doctor %}
+              <br>
+              <h5>&emsp;No Doctors Followed !</h5>
+              {% endif %}
                     {% for doctor in doctor %}
                     <br>
                     <div class="gaadiex-list-item border-b-1"><img class="gaadiex-list-item-img" src="{{doctor.imagefile.url}} " alt="List user">
                       <div class="gaadiex-list-item-text">
-                        <h3><a href="{% url 'viewdoctor' slug=doctor.dname %}">{{doctor.dname}}</a></h3>
+                        <h3><a href="{% url 'viewdoctor' slug=doctor.username %}">{{doctor.dname}}</a></h3>
                         <h4>{{doctor.spec}}</h4>
                         <p> <button class="btn btn-primary"><a style="color: white;"  href="{% url 'unfollowdoctor' pk=doctor.id %}">Unfollow</a>
                         </button>
@@ -74,11 +78,16 @@ a:link {
 		            <h4>Not Following</h4>
 		        </div>
 		        <div class="gaadiex-list">
+              {% if not unfollow %}
+              <br>
+              <h5>&emsp;No Doctors Found!</h5>
+              {% endif %}
+              
                     {% for doctor in unfollow %}
 <br>
                     <div class="gaadiex-list-item border-b-1"><img class="gaadiex-list-item-img" src="{{doctor.imagefile.url}} " alt="List user">
                       <div class="gaadiex-list-item-text">
-                        <h3><a href="{% url 'viewdoctor' slug=doctor.dname %}">{{doctor.dname}}</a></h3>
+                        <h3><a href="{% url 'viewdoctor' slug=doctor.username %}">{{doctor.dname}}</a></h3>
                         <h4>{{doctor.spec}}</h4>
                         <p><button class="btn btn-danger"> <a style="color: white;" href="{% url 'followdoctor' pk=doctor.id %}">Follow</a>
                         </button>

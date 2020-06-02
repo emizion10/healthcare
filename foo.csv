@@ -1,6 +1,2 @@
 ﻿ID,rating,description,author_id,doctor_id,spec,date
-2,4,not bad,2,5,Allergy and Immunology,2020-04-23T11:16:23.158449+00:00
-3,3,good,2,5,Urology,2020-04-23T11:16:23.158449+00:00
-4,5,very good,1,6,Urology,2020-04-23T11:16:23.158449+00:00
-5,4,dfgfd,1,7,Orthopedics,2020-04-23T11:16:23.158449+00:00
-6,5,marvelous,1,7,Orthopedics,2020-04-23T11:16:23.158449+00:00
+7,5,The diagnosis was quite satisfactory.,1,10,Traumatology,2020-06-02T13:16:35.374477+00:00

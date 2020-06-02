@@ -43,6 +43,22 @@ class UserAuthenticationForm(forms.ModelForm):
                 raise forms.ValidationError("Invalid login")
 
 
+class ChangePasswordForm(forms.Form):
+    # old_password = forms.CharField(widget=forms.PasswordInput, label='Old Password')
+    new_password = forms.CharField(widget=forms.PasswordInput, label='New Password')
+    confirm_password = forms.CharField(label='Confirm New Password')
+
+    def clean(self):
+        if self.is_valid():
+            
+                
+            new = self.cleaned_data['new_password']
+            confirm = self.cleaned_data['confirm_password']
+            if not (new==confirm):
+                raise forms.ValidationError("Passwords do not Match !")
+
+
+        
 class PatientForm(forms.ModelForm):
     username = forms.CharField(max_length=60, label='Username')
     password = forms.CharField(widget=forms.PasswordInput, label='Password')

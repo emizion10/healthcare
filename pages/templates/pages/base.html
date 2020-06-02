@@ -89,7 +89,7 @@
                         {% elif user.user_type == 2 %}
                         <li><a href="{% url 'addp' %}">Patient Registration</a></li>
                         <li><a href="{% url 'doctorprofile' %}">Profile</a></li>
-                        <li><a href="#">Dashboard <i class="ti-angle-down"></i></a>
+                        <li><a href="#">Dashboard &#9660;</a>
                           <ul class="submenu">
                             <li><a href="{% url 'myposts' %}">Posts</a></li>
                             <li><a href="{% url 'patients' %}">Patients</a></li>
@@ -121,8 +121,7 @@
                   <div class="Appointment">
                     <div class="book_btn d-none d-lg-block">
                       {% if user.user_type == 3 %}
-                      <a class="popup-with-form" href="#test-form">Make an
-                        Appointment</a>
+                      
                       {% elif user.user_type == 2 %}
                       <a class="popup-with-form" href="{% url 'treatpatient' %}">Treat Patient</a>
 
