@@ -28,6 +28,8 @@ admin.site.register(Follow)
 admin.site.register(Messages)
 admin.site.register(Education)
 admin.site.register(Experience)
+admin.site.register(Laboratory)
+admin.site.register(LaboratoryRecord)
 
 
 

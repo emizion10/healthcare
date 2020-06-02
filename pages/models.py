@@ -20,6 +20,8 @@ USER_TYPE_CHOICES = (
       (2, 'doctor'),
       (3, 'hospital'),
       (4,'admin'),
+      (5,'laboratory'),
+      
   )
 
 ACCESS_CHOICES = (
@@ -150,7 +152,7 @@ class Patient(models.Model):
 	height=models.DecimalField(max_digits=5, decimal_places=2,blank=True)
 	weight=models.DecimalField(max_digits=6, decimal_places=2,blank=True)
 	bloodgroup = models.CharField(choices=bloodgroup_choices, max_length=12, default='-', blank=True)
-	place=models.CharField(max_length=50,blank=True)
+	place=models.CharField(max_length=100,blank=True)
 	imagefile=models.ImageField(upload_to='patient/',default="default.jpg",blank=True,null=True)
 	email = models.EmailField(max_length=254,blank=True)
 	contact = models.CharField(max_length=14,blank=True)
@@ -196,9 +198,29 @@ class Hospital(models.Model):
 	services=models.TextField(blank=True)
 	email=models.EmailField(blank=True)
 	url=models.URLField(blank=True)
+	contact = models.CharField(max_length=14,blank=True)
+	address=models.TextField(blank=True)
+	description = models.TextField(blank=True)
+ 
 	imagefile=models.ImageField(upload_to='hospital/',blank=True,null=True)
 	location = PlacesField()
 	
+	def __str__(self):
+		return self.name
+
+class Laboratory(models.Model):
+	id=models.BigAutoField(primary_key=True)
+	username = models.OneToOneField(MyUser,on_delete=models.CASCADE)
+	regid=models.CharField(max_length=50,unique=True)
+	name=models.CharField(max_length=50)
+	email=models.EmailField(blank=True)
+	contact = models.CharField(max_length=14,blank=True)
+	services=models.TextField(blank=True)
+	
+	address=models.TextField(blank=True)
+	description = models.TextField(blank=True)
+ 
+ 
 	def __str__(self):
 		return self.name
 
@@ -225,6 +247,21 @@ class MedicalRecord(models.Model):
 	def __str__(self):
 		return u'%s  %s' % (self.patient_id, self.id)
 
+
+class LaboratoryRecord(models.Model):
+	id=models.BigAutoField(primary_key=True)
+	patient_id = models.ForeignKey(Patient, verbose_name="patient",on_delete=models.CASCADE)
+	lab_id = models.ForeignKey(Laboratory, verbose_name="laboratory",on_delete=models.CASCADE)
+	procedure = models.CharField(max_length=100,blank=True)
+	description = models.TextField(blank=True)
+	upload_file = models.FileField(upload_to='labrecords/',blank=True,null=True)
+	medrec = models.ForeignKey(MedicalRecord,on_delete=models.CASCADE)
+	add_date = models.DateTimeField(auto_now_add=True, verbose_name="Visit Date")
+ 
+	def __str__(self):
+		return u'%s  %s' % (self.patient_id, self.id)
+
+    
 
 class Review(models.Model):
     rating = models.IntegerField(blank=False)

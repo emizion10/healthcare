@@ -17,6 +17,10 @@ urlpatterns = [
     path('hospitalprofile/',HospitalProfile.as_view(), name='hospitalprofile'),
     path('patient/medicalcard/',MC.as_view(), name='medicalcard'),
     path('treatpatient/',TreatPatient.as_view(), name='treatpatient'),
+    path('laboratory/',LabRecord.as_view(), name='laboratory'),
+    path('laboratory/labpatient',views.labpatient, name='labpatient'),
+    path('addlaboratoryrecord/',views.addlabrecord, name='addlaboratoryrecord'),
+    
     path('treatpatient/patient',treatpatientprofile, name='patient'),
     path('treatpatient/medicalrecord',views.addmedicalrecord, name='addmedicalrecord'),
     path('medicalrecord/<int:pk>',MedicalRecordDetail.as_view(), name='medicalrecord'),

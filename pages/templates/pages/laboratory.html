@@ -1,0 +1,102 @@
+{% extends 'pages/base.html' %}
+{% block title %}Laboratory{% endblock %}
+{% load static %}
+{% load qr_code %}
+
+{% block script %}
+<style>
+  #pop {
+    display: none;
+}
+  </style>
+
+
+<script type="text/javascript" src="{% static '/js/instascan.min.js' %}"></script>
+
+
+<script type="text/javascript">
+
+    function scancode(){
+
+      document.getElementById("pop").style.display="initial";
+    
+    let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    scanner.addListener('scan', function (content) {
+      console.log(content);
+      pid = content;
+        document.getElementById('pid').value = content;
+
+
+
+    scanner.stop();
+    $('#scanform').submit();
+
+    $('#preview').hide();
+
+    });
+    Instascan.Camera.getCameras().then(function (cameras) {
+      if (cameras.length > 0) {
+        scanner.start(cameras[0]);
+      } else {
+        console.error('No cameras found.');
+      }
+    }).catch(function (e) {
+      console.error(e);
+    });
+    }
+    
+    </script>
+
+
+
+
+{% endblock %}
+{% block content %}
+
+<div  id="scan">
+  <center>
+    <button class="btn btn-danger"  onclick="scancode()">Scan Health Card</a>
+    </center>
+</div>
+
+<form id='scanform' method="POST" action="labpatient">
+        {% csrf_token %}
+    <input type="hidden" id="pid" name='regid'>
+</form>
+
+<div id="profile"></div>
+
+<br>
+<center>
+  <div id=pop>
+    <video id="preview"></video>
+  </div>
+</center>
+
+
+<center>
+{% qr_from_text 'healthchain' size="10" image_format="png" error_correction="L" %}
+</center>
+
+
+
+
+{% endblock %}
+
+{%  block endscript %}
+
+<script>
+  function myFunction() {
+  var popup = document.getElementById("myPopup");
+  popup.classList.toggle("show");
+  
+  if (popup.paused){ 
+      popup.play(); 
+      }
+    else{ 
+      popup.pause();
+      }
+   
+  }
+  </script>
+{% endblock %}

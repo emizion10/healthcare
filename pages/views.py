@@ -294,6 +294,15 @@ class TreatPatient(MyPermissionMixin, TemplateView):
         return (self.request.user.user_type == 2)
 
 
+class LabRecord(MyPermissionMixin, TemplateView):
+    raise_exception = True
+    login_url = "/login/"
+
+    template_name = 'pages/laboratory.html'
+
+    def test_func(self):
+        return (self.request.user.user_type == 5)
+
 @user_is_doctor
 def treatpatientprofile(request):
     if request.method == 'POST':
@@ -303,12 +312,46 @@ def treatpatientprofile(request):
         doc = get_object_or_404(Doctor, username=request.user)
 
         rec = MedicalRecord.objects.filter(Q(permission='public') | Q(
-            doctor_id=doc) | Q(access__iregex=r'('+str(doc.dname)+'),?'))
+            doctor_id=doc) | Q(access__iregex=r'('+str(doc.dname)+'),?')).order_by('-visit_date')
         return render(request, 'pages/patientprofile.html', {'patient': pt, 'records': rec})
+
+
+
+@user_is_laboratory
+def labpatient(request):
+    if request.method == 'POST':
+        request.session['regid'] = request.POST['regid']
+        reg = request.POST['regid']
+        pt = get_object_or_404(Patient, regid=reg)
+
+        rec = MedicalRecord.objects.filter().order_by('-visit_date')
+        return render(request, 'pages/patientprofile.html', {'patient': pt, 'records': rec})
+
+
+@user_is_laboratory
+def addlabrecord(request):
+    pt = get_object_or_404(Patient, regid=request.session['regid'])
+    rec = MedicalRecord.objects.filter().order_by('-visit_date')
+    
+    if request.method == 'POST':
+        labfile = request.FILES['labfile'] if 'labfile' in request.FILES else False
+        procedure = request.POST.get('procedure')
+        desc = request.POST.get('desc')
+        medrec = request.POST.get('medrec')
+        lab = get_object_or_404(Laboratory,username=request.user)
+        md = get_object_or_404(MedicalRecord,id=medrec)
+        lr = LaboratoryRecord.objects.create(patient_id=pt,lab_id=lab,procedure=procedure,description=desc,upload_file=labfile,medrec=md)      
+        return HttpResponseRedirect(reverse('medicalrecord', args=(medrec,)))
+
+        
+
+    return HttpResponseRedirect(reverse('medicalrecord', args=(medrec,)))
 
 
 @user_is_doctor
 def addmedicalrecord(request):
+    pt = get_object_or_404(Patient, regid=request.session['regid'])
+    
     if request.method == 'POST':
         form = MedicalRecordForm(request.POST)
         if form.is_valid():
@@ -322,12 +365,13 @@ def addmedicalrecord(request):
             pt = get_object_or_404(Patient, regid=request.session['regid'])
             doc = get_object_or_404(Doctor, username=request.user)
             rec = MedicalRecord.objects.filter(Q(permission='public') | Q(
-                doctor_id=doc) | Q(access__iregex=r'('+str(doc.dname)+'),?'))
+                doctor_id=doc) | Q(access__iregex=r'('+str(doc.dname)+'),?')).order_by('-visit_date')
             return render(request, 'pages/patientprofile.html', {'patient': pt, 'records': rec})
     else:
         form = MedicalRecordForm()
+        
 
-    return render(request, 'pages/addmedicalrecord.html', {'forms': form})
+    return render(request, 'pages/addmedicalrecord.html', {'forms': form,'patient':pt})
 
 
 class MedicalRecordDetail(MyPermissionMixin, DetailView):
@@ -342,11 +386,12 @@ class MedicalRecordDetail(MyPermissionMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(MedicalRecordDetail, self).get_context_data(**kwargs)
         rec = get_object_or_404(MedicalRecord,id=self.kwargs['pk'])
+        context['labrec'] = LaboratoryRecord.objects.filter(medrec=rec)
         context['patient'] = get_object_or_404(Patient,pname=rec.patient_id)
         return context
         
     def test_func(self):
-        return (self.request.user.user_type == 2 or self.request.user.user_type == 1)
+        return (self.request.user.user_type == 2 or self.request.user.user_type == 1 or self.request.user.user_type == 5)
 
 
 @user_is_patient

@@ -80,6 +80,71 @@
 
 }
 
+
+/* Popup */
+
+
+/* Popup message form */
+#loginPopup,#reviewpopup {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+      .form-popup {
+      border: 2px solid #666;
+      z-index: 9;
+      max-width: 300px;
+      margin: 0 auto;
+      }
+      .form-container {
+      max-width: 300px;
+      padding: 20px;
+      background-color: #fff;
+      }
+      /* Full-width for input fields */
+      .form-container input[type=text], .form-container textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0 22px 0;
+      border: none;
+      background: #eee;
+      }
+      /* When the inputs get focus, do something */
+      .form-container input[type=text]:focus, .form-container textarea:focus {
+      background-color: #ddd;
+      outline: none;
+      }
+      /* Style submit/login button */
+      .form-container .btn {
+      background-color: #8ebf42;
+      color: #fff;
+      padding: 12px 20px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom:10px;
+      opacity: 0.8;
+      }
+      /* Style cancel button */
+      .form-container .cancel {
+      background-color: #cc0000;
+      }
+      /* Hover effects for buttons */
+      .form-container .btn:hover, .open-button:hover {
+      opacity: 1;
+      }
+      nav li {display:inline-block;}
+     
+
+
 </style>
 {% endblock %}
 
@@ -136,7 +201,11 @@
                     <div class="col-sm-3 col-md-6">
                         <label>Procedures:</label>
                         {% for i in record.procedures %}
+                        {% if user.user_type == 5 %}
+                        <li> {{i}} &emsp; <button class="btn btn-success" onclick="openForm('{{i}}')">Add</button>  </li>
+                        {% else %}
                         <li> {{i}}</li>
+                        {% endif %}
                         {% endfor %}
                     </div>
                     <div class="col-sm-3 col-md-6">
@@ -159,7 +228,7 @@
                     <button id='savebtn' type="button" onclick="change()"
                         class="btn btn-success" disabled='true'>Save</button>
                     <br><br>
-                    
+
                     <input id='custom' type="text">
                     {% endif %}
 
@@ -168,8 +237,11 @@
                 </div>
 
 
-
-
+<hr>    
+<h4>Laboratory Records</h4>
+{% for r in labrec %}
+<h5>{{r.procedure}} &emsp;<a class="btn btn-danger" href="{{r.upload_file.url}}">Open</a> </h5>
+{% endfor %}
 
             </div>
 
@@ -178,6 +250,35 @@
 
     </div>
 
+    
+
+<div id="loginPopup">
+    <div class="form-popup" id="popupForm">
+      <form action="{% url 'addlaboratoryrecord' %}" method="POST" class="form-container"  enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2>Laboratory Record</h2>
+        <label for="email">
+          <strong>Procedure</strong>
+        </label>
+        <input type="text" id="email"  name="procedure"
+          required>
+        <label for="psw">
+          <strong>Description</strong>
+        </label>
+        <textarea id="psw" placeholder="Description" name="desc" required></textarea>
+        <label for="psw">
+            <strong>File</strong>
+          </label>
+          <input type="file" name='labfile'>
+          <br>
+        <input type="hidden" value="{{record.id}}" name="medrec">
+        <button type="submit" class="btn">Submit</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Cancel</button>
+      </form>
+    </div>
+  </div>
+  
+  
 
     <!-- end -->
 
@@ -215,5 +316,18 @@
             window.location.reload();
         })
     }
+
+
+//laboratory
+
+function openForm(proc) {
+    document.getElementById('email').value=proc;
+  document.getElementById("loginPopup").style.display="block";
+}
+
+function closeForm() {
+  document.getElementById("loginPopup").style.display= "none";
+}
+
 </script>
     {% endblock %}

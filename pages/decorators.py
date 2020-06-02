@@ -23,3 +23,15 @@ def user_is_patient(function):
     wrap.__doc__ = function.__doc__
     wrap.__name__ = function.__name__
     return wrap
+
+
+def user_is_laboratory(function):
+    def wrap(request,*args,**kwargs):
+        if request.user.user_type == 5:
+            return function(request,*args,**kwargs)
+        else:
+            raise PermissionDenied
+        
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
