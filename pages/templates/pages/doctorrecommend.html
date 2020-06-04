@@ -3,6 +3,10 @@
 {% block title %}Doctor Recommendation{% endblock %}
 {% block script %}
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKzjwtu-tyyJQtPP3rFPxPRCgtZHgmKfs&callback=initMap&v=3.exp&sensor=false&libraries=places"></script>
 
 <style type="text/css">
 	@import url('https://fonts.googleapis.com/css2?family=Lora&family=Yeseva+One&display=swap');
@@ -66,6 +70,7 @@ h6 {
 }
 
 
+
 .wrapper {
   margin: 8px 0;
 }
@@ -97,8 +102,8 @@ h6 {
 	position: absolute;
   display: inline;
   /*border-radius: 50%;*/
-  /* height: 20px;
-  width: 20px; */
+  height: 20px;
+  width: 20px;
   margin-left: 0px;
   /*box-shadow:
     -8px -4px 8px 0px #ffffff,
@@ -159,7 +164,7 @@ h6 {
 		padding: 0 11px 0 13px;
 		text-overflow: ellipsis;
 		width: 300px;
-		height :100px;
+		height: :100px;
 	}
 
 	#btnclass{
@@ -184,19 +189,15 @@ h6 {
 
 	
 	</style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKzjwtu-tyyJQtPP3rFPxPRCgtZHgmKfs&callback=initMap&v=3.exp&sensor=false&libraries=places"></script>
-
 
 	{% endblock %}
+
 	{% block content %}
 
-	
+
 	<div class="container2">
 		<br>
-		<h3>find doctors near you..</h3>
+		<h3>Find doctors near you..</h3>
 	<br>
 	<label class="labeltext"> Specialization: </label>
 	<select id="spec" >
@@ -229,7 +230,7 @@ h6 {
 
 	<br>
 	<label> </label>
-	<input type="text" id="my-address" placeholder="Enter preferred location "> 
+	<input type="text" id="my-address" placeholder="Enter preferred location " > 
 
 
 &nbsp;
@@ -274,13 +275,7 @@ h6 {
 	<p id="val"></p>
 
 </div>
-
-{% endblock %}
-
-{% block endscript %}
-
-<script type="text/javascript" >
-
+	<script >
 		var ff=0;
 		var latitude,longitude;
 		var sympt=[];
@@ -347,18 +342,22 @@ h6 {
 			}
 
 			var speclistToString = JSON.stringify(speclist); 
-				// var speclistToJsonObject = JSON.parse(speclistToString);
 
 
 				$.get('/home/predictdoctor/',{'latitude':latitude.toString(),'longitude':longitude.toString(),'spec':speclistToString, 'sortby':sortby}, function(data){
 					$("#sorbyoption").show();
-					window.alert(data);
+					// window.alert(data);
+					if(data=='1'){
+						t="<h5>No doctors found!!</h5>";
+					}
+					else{
 					parsed=JSON.parse(data);
 					t="";
 					t=t+"<tr><th>Doctor Name</th><th>Specialization</th><th>Location</th><th>Distance</th></tr>";
 					for(var z in parsed){
 						t=t+"<tr><td><a href='{% url 'index' %}'> " +parsed[z]['name']+"</a></td><td>"+parsed[z]['spec']+"&nbsp;&nbsp;</td><td>"+parsed[z]['location']+"</td><td>"+parsed[z]['distance']+"km&nbsp;</td></tr>";
 
+					}
 					}
 					$("#result").html(t);
 							 

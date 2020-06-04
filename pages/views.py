@@ -48,6 +48,8 @@ def index(request):
 def covid(request):
     return render(request,'pages/covid.html')
 
+def diseaseprediction(request):
+    return render(request,'pages/diseaseprediction.html')
 
 def capture(request):
     return render(request, 'pages/capture2.html')
@@ -304,7 +306,10 @@ class PatientList(MyPermissionMixin, ListView):
 
     def get_queryset(self):
         doc = get_object_or_404(Doctor,username=self.request.user)
-        return MedicalRecord.objects.filter(doctor_id=doc)
+        mrec = MedicalRecord.objects.filter(doctor_id=doc).order_by('-visit_date')
+        for m in mrec:
+            m.patient = get_object_or_404(Patient,pname=m.patient_id)
+        return mrec
 
     template_name = 'pages/patients.html'
 
@@ -473,11 +478,15 @@ class ViewDoctor(MyPermissionMixin, DetailView):
         usr = get_object_or_404(MyUser,username=self.kwargs['slug'])
 
         doc = get_object_or_404(Doctor, username=usr)
-        followers = pt.follower.filter(following=doc)
-        if followers:
-            context['follow'] = 'True'
+        
+        if self.request.user.user_type == 3:
+            pass
         else:
-            context['follow'] = 'False'
+            followers = pt.follower.filter(following=doc)
+            if followers:
+                context['follow'] = 'True'
+            else:
+                context['follow'] = 'False'
         
         if doc.username==self.request.user:
             context['profile']=True
@@ -494,7 +503,7 @@ class ViewDoctor(MyPermissionMixin, DetailView):
     template_name = 'pages/doctorprofile.html'
 
     def test_func(self):
-        return (self.request.user.user_type == 1 or self.request.user.user_type == 2)
+        return (self.request.user.user_type == 1 or self.request.user.user_type == 2 or self.request.user.user_type == 3)
 
 
 class DoctorList(MyPermissionMixin, ListView):
@@ -635,7 +644,7 @@ def unfollowdoctor(request, **kwargs):
             following=doc, doctor__username=request.user)
 
     follow.delete()
-    return HttpResponseRedirect(reverse('viewdoctor', args=(doc.dname,)))
+    return HttpResponseRedirect(reverse('viewdoctor', args=(doc.username,)))
 
 
 @user_is_patient
@@ -812,24 +821,20 @@ def logout_view(request):
 
 import csv
 from math import radians, sin, cos, acos
-# from django.http import HttpResponse
-# from .models import Review
 import numpy as np
 import pandas as pd
 from djqscsv import write_csv
 from django.db.models import Model
-# from pages.models import Review,Doctor
 from textblob import TextBlob
 from geopy.distance import geodesic
 import json
 import re
 
 
-@user_is_patient
+
 def doctorrecommend(request):
 	return render(request,'pages/doctorrecommend.html')
-
-@user_is_patient   	
+   	
 def predictdoctor(request):
 	d=[]
 	qs = Review.objects.all()
@@ -846,7 +851,7 @@ def predictdoctor(request):
 	docs = pd.DataFrame.from_records(Doctor.objects.all().values('id', 'dname','spec','location'))
 	doc=pd.DataFrame(docs.loc[docs['spec'].isin(speclist)])
 	if(doc.shape[0] == 0):
-		return HttpResponse("<h5>No doctors found!!</h5>")
+		return HttpResponse(1)
 	print(doc)
 	doc['distance']=0.000000000000
 	latitude=radians(float(request.GET.get('latitude')))
@@ -873,7 +878,7 @@ def predictdoctor(request):
 		doc.iat[i,4]=dis
 		print(doc.iloc[i,4])
 		i=i+1
-	print(doc)
+	print(doc,df)
 	combined_df=pd.merge(df,doc,left_on='doctor_id', right_on='id')
 
 	if sortby=='a':
@@ -882,13 +887,17 @@ def predictdoctor(request):
 		combined_df['weighted_rating']=combined_df.apply(lambda x: x.rating*10 + x.desc_val *7.5,axis=1)
 	else:
 		combined_df['weighted_rating']=combined_df.apply(lambda x: x.distance,axis=1)
+  
+	combined_df['weighted_rating']=combined_df.apply(lambda x: x.distance,axis=1)
+	print('er2')
+    
 	print(combined_df)
 	result=pd.DataFrame(combined_df.groupby(['doctor_id','distance'],as_index=False)['weighted_rating'].mean())
 	if sortby=='a' or sortby=='b':
 		final_df = result.sort_values(by=['weighted_rating'], ascending=False)
 	else:
 		final_df = result.sort_values(by=['weighted_rating'], ascending=True)
-	print(final_df)
+	print('as',final_df)
 	predicted=final_df['doctor_id'].to_list()
 	print(predicted)
 	# json = doc.to_json(orient='records')
@@ -915,3 +924,5 @@ def predictdoctor(request):
 	print(endlist)
 	print(res)
 	return HttpResponse(res)
+	# return HttpResponse("<h1>haaiii</h1>")
+

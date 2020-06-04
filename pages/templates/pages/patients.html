@@ -1,10 +1,74 @@
 {% extends 'pages/base.html' %}
 {% load crispy_forms_tags %}
 {% block title %}Patients{% endblock %}
+{% block script %}
+<style>
+.card {position: relative; border-radius: 3px; background-color: #fff;color: #4f5256;border: 1px solid #f2f2f2;margin-bottom: 16px;background:#fff;}
+.card-header{ padding: 16px;margin:0px;}
+.card-body {position: relative; padding: 16px;}
+
+.gaadiex-list {list-style-type: none; margin: 0;padding: 0;}
+.gaadiex-list>.gaadiex-list-item {padding: 0 22px;}
+.gaadiex-list-item-img  {
+    float: left;
+    width: 58px;
+    height: 58px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+.gaadiex-list-item i  {
+    float: left;
+    font-size:48px;
+    width: 58px;
+    height: 58px;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+.border-b-1 {border-bottom: 1px solid rgba(162,162,162,.16);}
+
+a:link {
+  text-decoration: none;
+}
+
+</style>
+
+
+{% endblock %}
 
 {% block content %}
+<div class="row">
+<div class="col-md-12">
 
-<div class="container">
-   
+    <div class="card">
+        <div class="card-header">
+            <h4>Patient Medical Records</h4>
+        </div>
+        <div class="gaadiex-list">
+      {% if not patients %}
+      <br>
+      <h5>&emsp;No Patients Treated !</h5>
+      {% endif %}
+            {% for p in patients %}
+            <br>
+           <a href="{% url 'medicalrecord' pk=p.pk %}">
+            <div class="gaadiex-list-item border-b-1"><img class="gaadiex-list-item-img" src="{{p.patient.imagefile.url}} " alt="List user">
+              <div class="gaadiex-list-item-text">
+                <h3>{{p.patient.pname}}</h3>
+                <h5>{{p.condition}}</h5>
+                <h5>{{p.visit_date}}</h5>
+
+                </p>
+              </div>
+            </div>
+        </a>
+            {% endfor %}
+          
+          </div>
+    </div>
+</div>
 </div>
 {% endblock %}

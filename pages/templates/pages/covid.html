@@ -1,6 +1,8 @@
-<!doctype html>
-<html lang="en">
-  <head>
+{% extends 'pages/base.html' %}
+{% block title %}Covid Checker{% endblock %}
+
+{% block script %}
+
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -10,10 +12,10 @@
 	<style type="text/css">
 
 
-		body{
+		/* body{
   font-family: 'Raleway', sans-serif;
   background: #E9ECE9;
-}
+} */
 .comments-main{
   background: #FFF;
 }
@@ -23,6 +25,7 @@
 }
 .comments-main ul li{
   list-style: none;
+  width: 550px;
 }
 .comments .comment {
   padding: 5px 10px;
@@ -37,7 +40,7 @@
 }
 .comments .comment h4 {
   display: inline-block;
-  font-size: 16px;
+  font-size: 14px;
 }
 .comments .comment h4 a {
   color: #404040;
@@ -90,6 +93,8 @@
     margin-left: 5px;
   }
 }
+
+
 	</style>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
@@ -125,6 +130,8 @@ function add(){
 }
 
 function present(id){
+	document.getElementById(id).disabled=true;
+
 	var symclicked = document.getElementById(id).name;
     var symselected = document.getElementById("reply").value;
 
@@ -158,9 +165,11 @@ function present(id){
 
 
 function absent(id){
+	document.getElementById(id).disabled=true;
+	rid = id.split('/')
 
 	ev={}
-	ev['id']=id;
+	ev['id']=rid[0];
 	ev['choice_id']='absent';
 	evidence.push(ev);
 
@@ -170,6 +179,7 @@ function absent(id){
 
 function yes(id){
 
+	document.getElementById(id).disabled=true;
 	ev={}
 	ev['id']=id;
 	ev['choice_id']='present';
@@ -182,9 +192,10 @@ function yes(id){
 
 
 function no(id){
-
+	document.getElementById(id).disabled=true;
+	rid = id.split('/')
 	ev={}
-	ev['id']=id;
+	ev['id']=rid[0];
 	ev['choice_id']='absent';
 	evidence.push(ev);
     document.getElementById("reply").value = "No";
@@ -199,7 +210,7 @@ function single(json){
 
         var op='';
 		 $.each(json.question.items, function(i, value) {
-	             op=op+"<button id='"+value.id+"'onclick=yes(this.id)>Yes</button ><button id='"+value.id+"'onclick=no(this.id)>No</button ><br>"
+	             op=op+"&emsp;<button style='border-radius:7px;' id='"+value.id+"'onclick=yes(this.id)>Yes</button >&emsp;<button style='border-radius:7px;' id='"+value.id+"/1'onclick=no(this.id)>No</button ><br>"
         });
          document.getElementById('res').innerHTML += hd+json.question.text+ op  + tl ;
 
@@ -208,7 +219,7 @@ function single(json){
 
 	function group_single(json){
 		gsc=gsc+1;
-		var op = "<select id='gs" + gsc + "'>";
+		var op = "<select style='width:400px;' id='gs" + gsc + "'>";
 		$.each(json.question.items, function(i, value) {
 	             op += "<option value='"+value.id +"'>"+   value.name +"</option>" ;
 	             
@@ -225,7 +236,7 @@ function single(json){
 
         var op='<br>';
 		 $.each(json.question.items, function(i, value) {
-	             op=op+value.name+"<button name='"+value.name+"' id='"+value.id+"'onclick=present(this.id)>Present</button ><button id='"+value.id+"'onclick=absent(this.id)>Absent</button ><br>"
+	             op=op+value.name+"&emsp;<button style='border-radius:7px;'  name='"+value.name+"' id='"+value.id+"'onclick=present(this.id)>Yes</button >&emsp;<button style='border-radius:7px;'  id='"+value.id+"/1'onclick=absent(this.id)>No</button ><br>"
         });
          document.getElementById('res').innerHTML += hd+json.question.text+ op  + tl ;
 
@@ -255,7 +266,7 @@ function conversation(input){
 					 op=op+"<p class='mb-0 text-white'> "+ value.name +"</p>"
 
 			        });
-        	 		document.getElementById('res').innerHTML += hd+ json.description +op  + tl ;
+        	 		document.getElementById('res').innerHTML += hd+ json.description +op  + tl  ;
 				   
 
     			},
@@ -313,7 +324,13 @@ function conversation(input){
 	 document.getElementById('reply').value='';
 
 	if(initial!=0){
-        document.getElementById('res').innerHTML += hdu+ input  + tl ;
+		if(input==''){
+			document.getElementById('res').innerHTML += hdu+ 'No options Selected.'  + tl ;
+
+		}else{
+			document.getElementById('res').innerHTML += hdu+ input  + tl ;
+
+		}
 
 		conversation(input);
 	}
@@ -343,7 +360,7 @@ function conversation(input){
         "App-Id": '0356a9a9',
        "App-Key":'116ba23bb4e06e901cdf29af1e8ee809', 
        'Content-Type': 'application/json',
-	//    'Version':'v2'
+	//    "Version":'v3',
     },
     dataType: 'json',
     success: function (json) {
@@ -366,10 +383,13 @@ function conversation(input){
 	}
 </script>
 
-<title>Covid Chatbot</title>
-  </head>
-  <body>
-	<div class="container">
+
+  {% endblock %}
+
+
+{% block content %}
+
+	<div class="container" style="width: 2000px;">
 		<div class="row mt-5">
 			<div class="col-md-6 offset-md-3 col-sm-6 offset-sm-3 col-12 comments-main pt-4 rounded">
 				<ul class="p-0">
@@ -380,7 +400,7 @@ function conversation(input){
 							</div>
 							<div class="col-md-9 col-sm-9 col-9 comment rounded mb-2">
 								<h4 class="m-0"><a href="#">Covid Bot</a></h4>
-							    <p class="mb-0 text-white">Welcome to Covid 19 Chatbot. Enter Your Age and Sex (Eg:- male 30):</p>
+							    <p class="mb-0 text-white">Welcome to Covid 19 Chatbot.  Enter Your Age and Sex (Eg:- male 30):</p>
 							</div>
 						</div>
 					</li>
@@ -399,8 +419,12 @@ function conversation(input){
 			</div>
 		</div>
 	</div>
-  </body>
+  <!-- </body> -->
   <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/0.12.14/vue.min.js'></script>
-</html>
+
+
+{% endblock %}
+
+<!-- </html> -->
 
 

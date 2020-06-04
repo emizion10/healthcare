@@ -244,7 +244,7 @@ a:link {
           class="gaadiex-list-item-img" src="{{doctor.imagefile.url}}"alt="List
           user">
         <div class="gaadiex-list-item-text">
-          <h3><a href="">{{doctor.dname}}</a></h3>
+          <h3><a href="{% url 'viewdoctor' slug=doctor.username %}">{{doctor.dname}}</a></h3>
 
           <h4>{{doctor.spec}}</h4>
           <br><br>
